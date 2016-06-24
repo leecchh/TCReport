@@ -2,6 +2,10 @@
 <!--MAKE SURE POP UP IS NOT BLOCKED-->
 <!--USE CHROME BROWSER TO ENSURE NO ERRORS-->
 
+<html>
+<head>
+</head>
+
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.2.min.js"><!--Uses jQuery Library hosted online-->
 </script>
    <script language="javascript" type="text/javascript">  
@@ -67,13 +71,14 @@
 			//alert(eventWant);
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
-         markup = '<title>Report</title>';  
+		 //Writing the title and styling the table
+         markup = "<style>table, th, td{border: 1px solid black;}</style><title>Report</title><h3><center>2016 Annual Meeting of the Association of Network"+
+		 " Representatives</center></h3><table style='width:100%'><tr><td>Time</td>"+
+		 "<td>Location - Room</td><td>Session</td><td>Speakers</td></tr>";  
          //Loop through all the items  
         while (enumerator.moveNext()) 
 		{  
 			 listItem = enumerator.get_current();
-			 //publish item if "publish" field set to true
-			//markup += 'Session: ' + listItem.get_item('Title') + '<br>';
 			 
 			 //Only include session if publish is set to true
 			var eventName=JSON.stringify(listItem.get_item('Event')); //Turns the event object to string
@@ -89,8 +94,52 @@
 			//markup += 'Event: ' + str + '<br><br>'; //What event session belongs to
 				
 			 if (listItem.get_item('Publish')&&(str==eventWant)) //Execute code if publish is true and session in event we want
-			 {
-				markup += 'Session: ' + listItem.get_item('Title') + '<br>';//Gets the session name
+			 {				
+				var start=String(listItem.get_item('Start_x0020_DateTime'));
+				var startArr = start.split("");
+				var startStr="";
+				//Parse for the start time
+				for (var i=16;i<21;i++)
+				{
+					startStr+=startArr[i];
+				}
+				
+				var end=String(listItem.get_item('End_x0020_DateTime'));
+				var endArr = end.split("");
+				var endStr="";
+				//Parse for the end time
+				for (var i=16;i<21;i++)
+				{
+					endStr+=endArr[i];
+				}
+				//markup += 'End Time: ' + endStr + '<br>';//End time for the session
+				
+				markup += "<tr><td>"+startStr+" - "+endStr+"</td>";
+				//markup += 'Start Time: ' +startStr + '<br>';//Start time for the session
+				
+				var roomName=listItem.get_item('Room_x0020_Name');
+				if (roomName!=null)
+				{
+					//Do nothing
+				}
+				else
+				{
+					roomName="None";//set room name to none
+				}
+				
+				var roomLocation=listItem.get_item('Room_x0020_Location');
+				if (roomLocation!=null)
+				{
+					markup+="<td>"+listItem.get_item('Room_x0020_Location')+" - "+roomName+"</td>";//Gets the location of the room of the session
+				}
+				else
+				{
+					markup+="<td>None - "+roomName+"</td>";//set location to none
+				}
+				
+				markup+="<td>"+listItem.get_item('Title')+"</td>";
+				//markup += 'Session: ' + listItem.get_item('Title') + '<br>';//Gets the session name
+				
 				var contactName=JSON.stringify(listItem.get_item('Speakers')); //Turns the event object to string
 				
 				var arr2 = contactName.split("");
@@ -108,7 +157,8 @@
 					i++;
 				}
 				
-				markup += 'Contacts: ' + str2 + '<br>';
+				markup+="<td>"+str2+"</td></tr>"
+				//markup += 'Contacts: ' + str2 + '<br>';
 				
 				markup += 'Source: ' + listItem.get_item('Source') + '<br>';//Gets the source for session
 				//Whether this is a group session
@@ -123,35 +173,6 @@
 				}
 				
 				markup += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
-				var roomName=listItem.get_item('Room_x0020_Name');
-				if (roomName!=null)
-				{
-					markup += 'Room Name: ' + listItem.get_item('Room_x0020_Name')+'<br>';//Gets the name of the room for the session
-				}
-				else
-				{
-					markup += 'Room Name: None<br>';//set room name to none
-				}
-				
-				var roomLocation=listItem.get_item('Room_x0020_Location');
-				if (roomLocation!=null)
-				{
-					markup += 'Room Location: ' + listItem.get_item('Room_x0020_Location')+'<br>';//Gets the location of the room of the session
-				}
-				else
-				{
-					markup += 'Room Location: None<br>';//set location to none
-				}
-				
-				var start=String(listItem.get_item('Start_x0020_DateTime'));
-				var startArr = start.split("");
-				var startStr="";
-				//Parse for the start time
-				for (var i=16;i<21;i++)
-				{
-					startStr+=startArr[i];
-				}				
-				markup += 'Start Time: ' +startStr + '<br>';//Start time for the session
 				
 				var startStr="";
 				//Parse for the start time
@@ -160,16 +181,6 @@
 					startStr+=startArr[i];
 				}	
 				markup += 'Start Date: ' + startStr + '<br>';//Start date for the session
-				
-				var end=String(listItem.get_item('End_x0020_DateTime'));
-				var endArr = end.split("");
-				var endStr="";
-				//Parse for the end time
-				for (var i=16;i<21;i++)
-				{
-					endStr+=endArr[i];
-				}
-				markup += 'End Time: ' + endStr + '<br>';//End time for the session
 				
 				var endStr="";
 				//Parse for the end time
@@ -253,8 +264,10 @@
 </script>  
 
 <!-- Modify new page for better UI -->
-<!-- Make Date and Time compatible across Browsers, object too if possible -->
-<!-- Drop down list based on events available (fix bug in populate event), move all to load location? -->
+<!-- OP2 Make Date and Time compatible across Browsers, object too if possible -->
+<!-- Organize Table according to start time-->
+<!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
+<!-- OP2 Add in Date of Report Filing -->
 
 <body>
 <select id="listEvents">
@@ -267,3 +280,4 @@
 <br><br>
 <div><button id="queryButton" onclick=" queryListItems ()">Create Report</button></div><!--Button calls queryListItems() when clicked-->
 </body>
+</html>
