@@ -95,40 +95,32 @@
 				
 			 if (listItem.get_item('Publish')&&(str==eventWant)) //Execute code if publish is true and session in event we want
 			 {				
-				/*
 				var num=((listItem.get_item('Start_x0020_DateTime')).getUTCHours()-(listItem.get_item('Start_x0020_DateTime')).getTimezoneOffset()/60);
 				if (num<0) {num+=24;}
 				var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
 				
-				if (num.toString().length==1) {num="0"+num;}
+				if (num.toString().length==1) {num="0"+String(num);}
 				else {num=String(num);}
 				
-				if (num2.toString().length==1) {num2="0"+num2;}
+				if (num2.toString().length==1) {num2="0"+String(num2);}
 				else {num2=String(num2);}
 				
 				var timeStart=num+":"+num2;
-				*/
-			 
-				var start=String(listItem.get_item('Start_x0020_DateTime'));
-				var startArr = start.split("");
-				var startStr="";
-				//Parse for the start time
-				for (var i=16;i<21;i++)
-				{
-					startStr+=startArr[i];
-				}
 				
-				var end=String(listItem.get_item('End_x0020_DateTime'));
-				var endArr = end.split("");
-				var endStr="";
-				//Parse for the end time
-				for (var i=16;i<21;i++)
-				{
-					endStr+=endArr[i];
-				}
-				//markup += 'End Time: ' + endStr + '<br>';//End time for the session
 				
-				markup += "<tr><td>"+startStr+" - "+endStr+"</td>";
+				var num=((listItem.get_item('End_x0020_DateTime')).getUTCHours()-(listItem.get_item('End_x0020_DateTime')).getTimezoneOffset()/60);
+				if (num<0) {num+=24;}
+				var num2=(listItem.get_item('End_x0020_DateTime')).getMinutes();
+				
+				if (num.toString().length==1) {num="0"+String(num);}
+				else {num=String(num);}
+				
+				if (num2.toString().length==1) {num2="0"+String(num2);}
+				else {num2=String(num2);}
+
+				var timeEnd=num+":"+num2;
+				
+				markup += "<tr><td>"+String(timeStart)+" - "+String(timeEnd)+"</td>";
 				//markup += 'Start Time: ' +startStr + '<br>';//Start time for the session
 				
 				var roomName=listItem.get_item('Room_x0020_Name');
@@ -188,20 +180,16 @@
 				
 				markup += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
 				
+				//var num=((listItem.get_item('Start_x0020_DateTime')).getDay());
+				//var num=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
+				//var num=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
+				//var num=((listItem.get_item('End_x0020_DateTime')).getDay());
+				//var num=((listItem.get_item('End_x0020_DateTime')).getMonth()+1);
+				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());
 				var startStr="";
-				//Parse for the start time
-				for (var i=4;i<16;i++)
-				{
-					startStr+=startArr[i];
-				}	
 				markup += 'Start Date: ' + startStr + '<br>';//Start date for the session
 				
 				var endStr="";
-				//Parse for the end time
-				for (var i=4;i<16;i++)
-				{
-					endStr+=endArr[i];
-				}
 				markup += 'End Date: ' + endStr + '<br><br>';//End time for the session
 				
 				
@@ -277,7 +265,8 @@
 	}*/
 </script>  
 
-<!-- OP2 Make Date and Time compatible across Browsers, object too if possible -->
+<!-- Comments-->
+<!-- Make Date compatible across Browsers, Event object too if possible -->
 <!-- Organize Table according to start time-->
 <!-- Modify new page for better UI -->
 <!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
