@@ -95,6 +95,20 @@
 				
 			 if (listItem.get_item('Publish')&&(str==eventWant)) //Execute code if publish is true and session in event we want
 			 {				
+				/*
+				var num=((listItem.get_item('Start_x0020_DateTime')).getUTCHours()-(listItem.get_item('Start_x0020_DateTime')).getTimezoneOffset()/60);
+				if (num<0) {num+=24;}
+				var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
+				
+				if (num.toString().length==1) {num="0"+num;}
+				else {num=String(num);}
+				
+				if (num2.toString().length==1) {num2="0"+num2;}
+				else {num2=String(num2);}
+				
+				var timeStart=num+":"+num2;
+				*/
+			 
 				var start=String(listItem.get_item('Start_x0020_DateTime'));
 				var startArr = start.split("");
 				var startStr="";
@@ -263,9 +277,9 @@
 	}*/
 </script>  
 
-<!-- Modify new page for better UI -->
 <!-- OP2 Make Date and Time compatible across Browsers, object too if possible -->
 <!-- Organize Table according to start time-->
+<!-- Modify new page for better UI -->
 <!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
 <!-- OP2 Add in Date of Report Filing -->
 
