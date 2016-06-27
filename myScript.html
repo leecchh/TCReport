@@ -16,27 +16,55 @@
 	  var eventList=[];
 	  	var eventWant="";
       var returnedItems = null;
-	  var context;
-	  var list;
-	  var caml;
-	  var enumerator;
+	  var returnedItems2 = null;
 	  var markup;
 	  var listItem;
+	  var listItem2;
 	  var sel;
 	  var opt;
-	  
+	  var speakerList=[];
+	  var speakerData=[];
 	  
 	  $(window).load( function() {
 			//if (populateEvent()!="Failed")
 			//{
 				var selectHtml="";
 				selectHtml+="";
-				//alert('wow');
 				//populateEvent();
 				//alert(eventList[0]);
 				//document.getElementById("listEvents").innerHTML = "<option selected value='base'>Select Event</option>";
 			//}
 		});
+		
+	function querySpeaker()
+   {
+   	  var context2;
+	  var list2;
+	  var caml2;
+		 //Get the current context  
+		 context2 = new SP.ClientContext();  
+		 //Get the Sessions list. Alter this code to match the name of your list  
+		 list2 = context2.get_web().get_lists().getByTitle('Contacts');  
+		 //Create a new CAML query
+		 caml2 = new SP.CamlQuery();  
+		 caml2.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
+		 //Specify the query and load the list oject  
+		 returnedItems2 = list2.getItems(caml2);  
+		 context2.load(returnedItems2);  
+		 //Run the query asynchronously, passing the functions to call when a response arrives  
+		 context2.executeQueryAsync(speakerCallback, onFailedCallback2);
+   }
+   
+   	function speakerCallback(sender, args) 
+	{
+        var enumerator2 = returnedItems2.getEnumerator();  
+		while (enumerator2.moveNext()) 
+		{  
+			 listItem2 = enumerator2.get_current();
+			 alert(listItem2.get_item('Title'));
+			 speakerList.push(listItem2.get_item('Title'));
+		}
+	}
   
       //This function loads the list and runs the query asynchronously  
       function queryListItems() { 
@@ -50,6 +78,10 @@
 		 //Continue if user has selected an option
 		 else
 		 {
+				  var context;
+	  var list;
+	  var caml;
+
 			 //Get the current context  
 			 context = new SP.ClientContext();  
 			 //Get the Sessions list. Alter this code to match the name of your list  
@@ -68,7 +100,7 @@
       //This function fires when the query completes successfully  
       function onSucceededCallback(sender, args) {  
          //Get an enumerator for the items in the list 
-			//alert(eventWant);
+		var enumerator;
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
 		 //Writing the title and styling the table
@@ -152,8 +184,20 @@
 				
 				markup+="<td>"+listItem.get_item('Title')+"</td>";
 				//markup += 'Session: ' + listItem.get_item('Title') + '<br>';//Gets the session name
+				/*
+				var count=0;
+				while(listItem.get_item('Speakers')[count]!=undefined)
+				{
+					var tempStr=(listItem.get_item('Speakers')[count]).get_lookupValue();
+					
+					//Get contact value and add to markup
+					querySpeaker();
+					
+					count++;
+				}
+				////////////////////////WORKING PROGRESS*/
 				
-				var contactName=JSON.stringify(listItem.get_item('Speakers')); //Turns the event object to string
+				var contactName=JSON.stringify(listItem.get_item('Speakers')); //Turns the speaker object to string
 				
 				var arr2 = contactName.split("");
 				var i=19;
@@ -196,7 +240,8 @@
 				
 				//markup += 'Item ID: ' + listItem.get_id() + '<br>';  			
 			 }
-		}  
+		}	
+		alert(speakerList[5]);
 	  //open new window, MAKE SURE POP UP WINDOW IS NOT BLOCKED
 		newwindow=window.open();
 		newdocument=newwindow.document;
@@ -206,10 +251,12 @@
    
    //This function fires when the query fails  
    function onFailedCallback(sender, args) {  
-      //Formulate HTML to display details of the error  
-      markup = '<p>The request failed: <br>';  
-      markup += 'Message: ' + args.get_message() + '<br>';  
       //Display the details  
+	  alert('Query failed');
+   }  
+    function onFailedCallback2(sender, args) {  
+      //Display the details  
+	  alert('Query failed');
    }  
    
    /*
@@ -264,10 +311,18 @@
 			sel.appendChild(opt);
 			alert('wow2');
 	}*/
+	function call2()
+	{
+		querySpeaker ();
+		alert('break');
+		queryListItems ();
+	}
+
+		
 </script>  
 
 <!-- Comments-->
-<!-- Make event object compatible if possible -->
+<!-- Make event and contact object compatible if possible -->
 <!-- Organize Table according to start time-->
 <!-- Modify new page for better UI -->
 <!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
@@ -280,8 +335,8 @@
   <option value="Event 1">Event 1</option> 
   <option value="Event 2">Event 2</option>
 </select>
-<div><button id="updateButton" onclick=" populateEvent ()">Update Events</button></div>
+<div><button id="updateButton" onclick=" querySpeaker ()">Update Events</button></div>
 <br><br>
-<div><button id="queryButton" onclick=" queryListItems ()">Create Report</button></div><!--Button calls queryListItems() when clicked-->
+<div><button id="queryButton" onclick=" call2()">Create Report</button></div><!--Button calls queryListItems() when clicked-->
 </body>
 </html>
