@@ -91,37 +91,44 @@
 				str+=arr[i];
 				i++;
 			}
-			//markup += 'Event: ' + str + '<br><br>'; //What event session belongs to
+			//str is what event session belongs to
 				
-			 if (listItem.get_item('Publish')&&(str==eventWant)) //Execute code if publish is true and session in event we want
+			 if (listItem.get_item('Publish')&&(str==eventWant)) //Execute code if publish is true and session in event we want to query
 			 {				
-				var num=((listItem.get_item('Start_x0020_DateTime')).getUTCHours()-(listItem.get_item('Start_x0020_DateTime')).getTimezoneOffset()/60);
-				if (num<0) {num+=24;}
+				var num=((listItem.get_item('Start_x0020_DateTime')).getHours());
+				//num gets the hour of the start time
 				var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
+				//num2 get the minute of the start time
 				
 				if (num.toString().length==1) {num="0"+String(num);}
 				else {num=String(num);}
+				//adds a 0 to the string num if it has 1 digit
 				
 				if (num2.toString().length==1) {num2="0"+String(num2);}
 				else {num2=String(num2);}
+				//adds a 0 to the string num2 if it has 1 digit
 				
 				var timeStart=num+":"+num2;
+				//make the timeStart string to represent start time
 				
+				var num3=((listItem.get_item('End_x0020_DateTime')).getHours());
+				//num3 gets the hour of the end time
+				var num4=(listItem.get_item('End_x0020_DateTime')).getMinutes();
+				//num4 gets the minute of the end time
 				
-				var num=((listItem.get_item('End_x0020_DateTime')).getUTCHours()-(listItem.get_item('End_x0020_DateTime')).getTimezoneOffset()/60);
-				if (num<0) {num+=24;}
-				var num2=(listItem.get_item('End_x0020_DateTime')).getMinutes();
+				if (num3.toString().length==1) {num3="0"+String(num3);}
+				else {num3=String(num3);}
+				//adds a 0 to the string num3 if it has 1 digit
 				
-				if (num.toString().length==1) {num="0"+String(num);}
-				else {num=String(num);}
-				
-				if (num2.toString().length==1) {num2="0"+String(num2);}
-				else {num2=String(num2);}
+				if (num4.toString().length==1) {num4="0"+String(num4);}
+				else {num4=String(num4);}
+				//adds a 0 to the string num4 if it has 1 digit
 
-				var timeEnd=num+":"+num2;
+				var timeEnd=num3+":"+num4;
+				//make the timeend string to represent end time
 				
 				markup += "<tr><td>"+String(timeStart)+" - "+String(timeEnd)+"</td>";
-				//markup += 'Start Time: ' +startStr + '<br>';//Start time for the session
+				//add the variables to the html display
 				
 				var roomName=listItem.get_item('Room_x0020_Name');
 				if (roomName!=null)
@@ -185,13 +192,7 @@
 				//var num=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
 				//var num=((listItem.get_item('End_x0020_DateTime')).getDay());
 				//var num=((listItem.get_item('End_x0020_DateTime')).getMonth()+1);
-				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());
-				var startStr="";
-				markup += 'Start Date: ' + startStr + '<br>';//Start date for the session
-				
-				var endStr="";
-				markup += 'End Date: ' + endStr + '<br><br>';//End time for the session
-				
+				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());				
 				
 				//markup += 'Item ID: ' + listItem.get_id() + '<br>';  			
 			 }
@@ -266,7 +267,7 @@
 </script>  
 
 <!-- Comments-->
-<!-- Make Date compatible across Browsers, Event object too if possible -->
+<!-- Make event object compatible if possible -->
 <!-- Organize Table according to start time-->
 <!-- Modify new page for better UI -->
 <!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
