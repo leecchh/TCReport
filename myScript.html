@@ -22,8 +22,22 @@
 	  var listItem2;
 	  var sel;
 	  var opt;
+	  //variables for speaker data to be initiated
 	  var speakerList=[];
-	  var speakerData=[];
+	  var speakerJob=[];
+	  var speakerAdd=[];
+	  var speakerCity=[];
+	  var speakerState=[];
+	  var speakerPhone=[];
+	  var speakerFax=[];
+	  var speakerEmail=[];
+	  var speakerDes=[];
+	  var speakerFR=[];
+	  var speakerNO=[];
+	  var speakerDNO=[];
+	  var speakerContact=[];
+	  var speakerAgree=[];
+	  var speakerCom=[];
 	  
 	  $(window).load( function() {
 			//if (populateEvent()!="Failed")
@@ -58,11 +72,126 @@
    	function speakerCallback(sender, args) 
 	{
         var enumerator2 = returnedItems2.getEnumerator();  
+		var counter=0;
 		while (enumerator2.moveNext()) 
 		{  
 			 listItem2 = enumerator2.get_current();
-			 alert(listItem2.get_item('Title'));
 			 speakerList.push(listItem2.get_item('Title'));
+			 //Store each type of data in an array for each contact, grouped by the type of data
+			 //For example speakerList[0] would be the name of the first contact, speakerList[1] is name of second contact
+			 if (listItem2.get_item('Job_x0020_Title')!=null)
+			 {
+				speakerJob.push(listItem2.get_item('Job_x0020_Title'));
+			 }
+			else
+			{
+				speakerJob.push("None");
+			}
+			if(listItem2.get_item('Street_x0020_Address')!=null)
+			{
+				speakerAdd.push(listItem2.get_item('Street_x0020_Address'));
+			}
+			else
+			{
+				speakerAdd.push("None");
+			}
+			if(listItem2.get_item('City')!=null)
+			{
+				speakerCity.push(listItem2.get_item('City'));
+			}
+			else
+			{
+				speakerCity.push("None");
+			}
+			if(listItem2.get_item('State')!=null)
+			{
+				speakerState.push(listItem2.get_item('State'));
+			}
+			else
+			{
+				speakerState.push("None");
+			}
+			if(listItem2.get_item('Phone')!=null)
+			{
+				speakerPhone.push(listItem2.get_item('Phone'));
+			}
+			else
+			{
+				speakerPhone.push("None");
+			}
+			if(listItem2.get_item('Fax')!=null)
+			{
+				speakerFax.push(listItem2.get_item('Fax'));
+			}
+			else
+			{
+				speakerFax.push("None");
+			}
+			if(listItem2.get_item('E_x002d_Mail_x0020_Address')!=null)
+			{
+				speakerEmail.push(listItem2.get_item('E_x002d_Mail_x0020_Address'));
+			}
+			else
+			{
+				speakerEmail.push("None");
+			}
+			if(listItem2.get_item('Designations')!=null)
+			{
+				speakerDes.push(listItem2.get_item('Designations'));
+			}
+			else
+			{
+				speakerDes.push("None");
+			}
+			if(listItem2.get_item('FR_x0020_Number')!=null)
+			{
+				speakerFR.push(listItem2.get_item('FR_x0020_Number'));
+			}
+			else
+			{
+				speakerFR.push("None");
+			}
+			if(listItem2.get_item('NO_x0020_Number')!=null)
+			{
+				speakerNO.push(listItem2.get_item('NO_x0020_Number'));
+			}
+			else
+			{
+				speakerNO.push("None");
+			}
+			if(listItem2.get_item('DNO_x0020_Number')!=null)
+			{
+				speakerDNO.push(listItem2.get_item('DNO_x0020_Number'));
+			}
+			else
+			{
+				speakerDNO.push("None");
+			}
+			if(listItem2.get_item('Contact_x0020_Type')!=null)
+			{
+				speakerContact.push(listItem2.get_item('Contact_x0020_Type'));
+			}
+			else
+			{
+				speakerContact.push("None");
+			}
+			if(listItem2.get_item('Speaker_x0020_agreement')!=null)
+			{
+				speakerAgree.push(listItem2.get_item('Speaker_x0020_agreement'));
+			}
+			else
+			{
+				speakerAgree.push("None");
+			}	
+			if(listItem2.get_item('Speaker_x0020_Compliance')!=null)
+			{
+				speakerCom.push(listItem2.get_item('Speaker_x0020_Compliance'));
+			}
+			else
+			{
+				speakerCom.push("None");
+			}	
+			 counter++;
 		}
 	}
   
@@ -241,7 +370,7 @@
 				//markup += 'Item ID: ' + listItem.get_id() + '<br>';  			
 			 }
 		}	
-		alert(speakerList[5]);
+		//markup+=speakerList[5][0];
 	  //open new window, MAKE SURE POP UP WINDOW IS NOT BLOCKED
 		newwindow=window.open();
 		newdocument=newwindow.document;
