@@ -313,19 +313,36 @@
 				
 				markup+="<td>"+listItem.get_item('Title')+"</td>";
 				//markup += 'Session: ' + listItem.get_item('Title') + '<br>';//Gets the session name
-				/*
+				
 				var count=0;
+				var displayStr="";
 				while(listItem.get_item('Speakers')[count]!=undefined)
 				{
 					var tempStr=(listItem.get_item('Speakers')[count]).get_lookupValue();
+					if (count!=0)
+					{
+						displayStr+="<br>"
+					}
+					displayStr+=tempStr;
 					
 					//Get contact value and add to markup
-					querySpeaker();
-					
+					//querySpeaker();
+					var speakerNum=-1;
+					for(var i=0;i<speakerList.length;i++)
+					{
+						if(speakerList[i]==tempStr)
+						{
+							speakerNum=i;
+							break;
+						}
+					}
+					displayStr+=", Job: "+speakerJob[speakerNum];
+					//ADD IN OTHER ATTRIBUTES
 					count++;
 				}
-				////////////////////////WORKING PROGRESS*/
+				markup+="<td>"+displayStr+"</td></tr>"
 				
+				/*
 				var contactName=JSON.stringify(listItem.get_item('Speakers')); //Turns the speaker object to string
 				
 				var arr2 = contactName.split("");
@@ -343,7 +360,7 @@
 					i++;
 				}
 				
-				markup+="<td>"+str2+"</td></tr>"
+				markup+="<td>"+str2+"</td></tr>"*/
 				//markup += 'Contacts: ' + str2 + '<br>';
 				
 				markup += 'Source: ' + listItem.get_item('Source') + '<br>';//Gets the source for session
@@ -451,7 +468,8 @@
 </script>  
 
 <!-- Comments-->
-<!-- Make event and contact object compatible if possible -->
+<!-- Get code to work without alert in function call2-->
+<!-- Make event object compatible if possible -->
 <!-- Organize Table according to start time-->
 <!-- Modify new page for better UI -->
 <!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
