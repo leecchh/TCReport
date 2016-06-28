@@ -24,8 +24,7 @@
 	  var opt;
 	  
 	  var eventOrder=[];
-	  var timeHour=[];
-	  var timeMin=[];
+	  var timeEvent=[];
 	  //variables for speaker data to be initiated
 	  var speakerList=[];
 	  var speakerJob=[];
@@ -267,8 +266,8 @@
 				var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
 				//num2 get the minute of the start time
 				
-				timeHour[order]=num;
-				timeMin[order]=num2;
+				timeEvent[order]=num;
+				timeEvent[order]+=num2*1.0/60;
 				
 				if (num.toString().length==1) {num="0"+String(num);}
 				else {num=String(num);}
@@ -363,7 +362,7 @@
 					displayStr+="Agreement: "+speakerAgree[speakerNum]+"<br>";
 					displayStr+="Compliance: "+speakerCom[speakerNum]+"<br>";
 					//ADD IN OTHER ATTRIBUTES
-					count++;
+					count++; //Increment count until there are no more contacts
 				}
 				eventOrder[order]+="<td>"+displayStr+"</td></tr>"
 				
@@ -392,6 +391,21 @@
 			 }
 			 order++;//add one to the variable in order to organize the events based on start time
 		}	
+		
+		//Selection sort O(n^2) in terms of start time, can be improved for large data sets
+		for(var a=0;a<timeEvent.length-1;a++)
+		{
+			for(var b=a+1;b<timeEvent.length;b++)
+			{
+				if (timeEvent[a]>timeEvent[b])
+				{
+					var temp=eventOrder[a];
+					eventOrder[a]=eventOrder[b];
+					eventOrder[b]=temp;
+				}
+			}
+		}
+		
 		for(var i=0;i<eventOrder.length;i++)
 		{
 			markup+=eventOrder[i];
@@ -468,7 +482,6 @@
 	function call2()
 	{
 		querySpeaker ();
-		alert('loading');
 		queryListItems ();
 	}
 
@@ -476,11 +489,10 @@
 </script>  
 
 <!-- Comments-->
-<!-- Get code to work without alert in function call2-->
-<!-- Organize Table according to start time-->
 <!-- Make event object compatible if possible -->
 <!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
 <!-- OP2 Add in Date of Report Filing -->
+<!-- Improve selection sort-->
 
 <body>
 <select id="listEvents">
