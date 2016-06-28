@@ -22,6 +22,10 @@
 	  var listItem2;
 	  var sel;
 	  var opt;
+	  
+	  var eventOrder=[];
+	  var timeHour=[];
+	  var timeMin=[];
 	  //variables for speaker data to be initiated
 	  var speakerList=[];
 	  var speakerJob=[];
@@ -194,7 +198,7 @@
 			 counter++;
 		}
 	}
-  
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //This function loads the list and runs the query asynchronously  
       function queryListItems() { 
 		var yourSelect = document.getElementById( "listEvents" );	
@@ -237,8 +241,10 @@
 		 " Representatives</center></h3><table style='width:100%'><tr><td>Time</td>"+
 		 "<td>Location - Room</td><td>Session</td><td>Speakers</td></tr>";  
          //Loop through all the items  
+		 var order=0;
         while (enumerator.moveNext()) 
 		{  
+			eventOrder[order]="";
 			 listItem = enumerator.get_current();
 			 
 			 //Only include session if publish is set to true
@@ -260,6 +266,9 @@
 				//num gets the hour of the start time
 				var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
 				//num2 get the minute of the start time
+				
+				timeHour[order]=num;
+				timeMin[order]=num2;
 				
 				if (num.toString().length==1) {num="0"+String(num);}
 				else {num=String(num);}
@@ -288,7 +297,7 @@
 				var timeEnd=num3+":"+num4;
 				//make the timeend string to represent end time
 				
-				markup += "<tr><td>"+String(timeStart)+" - "+String(timeEnd)+"</td>";
+				eventOrder[order] += "<tr><td>"+String(timeStart)+" - "+String(timeEnd)+"</td>";
 				//add the variables to the html display
 				
 				var roomName=listItem.get_item('Room_x0020_Name');
@@ -304,14 +313,14 @@
 				var roomLocation=listItem.get_item('Room_x0020_Location');
 				if (roomLocation!=null)
 				{
-					markup+="<td>"+listItem.get_item('Room_x0020_Location')+" - "+roomName+"</td>";//Gets the location of the room of the session
+					eventOrder[order]+="<td>"+listItem.get_item('Room_x0020_Location')+" - "+roomName+"</td>";//Gets the location of the room of the session
 				}
 				else
 				{
-					markup+="<td>None - "+roomName+"</td>";//set location to none
+					eventOrder[order]+="<td>None - "+roomName+"</td>";//set location to none
 				}
 				
-				markup+="<td>"+listItem.get_item('Title')+"</td>";
+				eventOrder[order]+="<td>"+listItem.get_item('Title')+"</td>";
 				//markup += 'Session: ' + listItem.get_item('Title') + '<br>';//Gets the session name
 				
 				var count=0;
@@ -321,6 +330,7 @@
 					var tempStr=(listItem.get_item('Speakers')[count]).get_lookupValue();
 					if (count!=0)
 					{
+						//add a line break if not the first speaker
 						displayStr+="<br>"
 					}
 					displayStr+=tempStr;
@@ -330,40 +340,34 @@
 					var speakerNum=-1;
 					for(var i=0;i<speakerList.length;i++)
 					{
+						//find the index of the speaker stored in the array
 						if(speakerList[i]==tempStr)
 						{
 							speakerNum=i;
 							break;
 						}
 					}
-					displayStr+=", Job: "+speakerJob[speakerNum];
+					//display all the data for a specific speaker
+					displayStr+=", Job: "+speakerJob[speakerNum]+"<br>";
+					displayStr+="Address: "+speakerAdd[speakerNum]+"<br>";
+					displayStr+="City: "+speakerCity[speakerNum]+"<br>";
+					displayStr+="State: "+speakerState[speakerNum]+"<br>";
+					displayStr+="Phone: "+speakerPhone[speakerNum]+"<br>";
+					displayStr+="Fax: "+speakerFax[speakerNum]+"<br>";
+					displayStr+="Email: "+speakerEmail[speakerNum]+"<br>";
+					displayStr+="Designations: "+speakerDes[speakerNum]+"<br>";
+					displayStr+="FR: "+speakerFR[speakerNum]+"<br>";
+					displayStr+="NO: "+speakerNO[speakerNum]+"<br>";
+					displayStr+="DNO: "+speakerDNO[speakerNum]+"<br>";
+					displayStr+="Contact Type: "+speakerContact[speakerNum]+"<br>";
+					displayStr+="Agreement: "+speakerAgree[speakerNum]+"<br>";
+					displayStr+="Compliance: "+speakerCom[speakerNum]+"<br>";
 					//ADD IN OTHER ATTRIBUTES
 					count++;
 				}
-				markup+="<td>"+displayStr+"</td></tr>"
+				eventOrder[order]+="<td>"+displayStr+"</td></tr>"
 				
-				/*
-				var contactName=JSON.stringify(listItem.get_item('Speakers')); //Turns the speaker object to string
-				
-				var arr2 = contactName.split("");
-				var i=19;
-				var str2="";
-				//parsing the contactName string below, method may have to be modified based on JSON.stringify output
-				while (i<arr2.length-3)
-				{
-					str2+=arr2[i];
-					if (arr2[i+3]==',')
-					{
-						str2+=", ";
-						i=i+21;
-					}
-					i++;
-				}
-				
-				markup+="<td>"+str2+"</td></tr>"*/
-				//markup += 'Contacts: ' + str2 + '<br>';
-				
-				markup += 'Source: ' + listItem.get_item('Source') + '<br>';//Gets the source for session
+				eventOrder[order] += 'Source: ' + listItem.get_item('Source') + '<br>';//Gets the source for session
 				//Whether this is a group session
 				var check="";
 				if (listItem.get_item('Group_x0020_Session')==true)
@@ -375,7 +379,7 @@
 					check="No"
 				}
 				
-				markup += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
+				eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
 				
 				//var num=((listItem.get_item('Start_x0020_DateTime')).getDay());
 				//var num=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
@@ -386,8 +390,12 @@
 				
 				//markup += 'Item ID: ' + listItem.get_id() + '<br>';  			
 			 }
+			 order++;//add one to the variable in order to organize the events based on start time
 		}	
-		//markup+=speakerList[5][0];
+		for(var i=0;i<eventOrder.length;i++)
+		{
+			markup+=eventOrder[i];
+		}
 	  //open new window, MAKE SURE POP UP WINDOW IS NOT BLOCKED
 		newwindow=window.open();
 		newdocument=newwindow.document;
@@ -460,7 +468,7 @@
 	function call2()
 	{
 		querySpeaker ();
-		alert('break');
+		alert('loading');
 		queryListItems ();
 	}
 
@@ -469,9 +477,8 @@
 
 <!-- Comments-->
 <!-- Get code to work without alert in function call2-->
-<!-- Make event object compatible if possible -->
 <!-- Organize Table according to start time-->
-<!-- Modify new page for better UI -->
+<!-- Make event object compatible if possible -->
 <!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
 <!-- OP2 Add in Date of Report Filing -->
 
