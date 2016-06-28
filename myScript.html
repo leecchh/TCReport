@@ -17,6 +17,7 @@
 	  	var eventWant="";
       var returnedItems = null;
 	  var returnedItems2 = null;
+	  var returnedItems3 = null;
 	  var markup;
 	  var listItem;
 	  var listItem2;
@@ -47,8 +48,7 @@
 			//{
 				var selectHtml="";
 				selectHtml+="";
-				//populateEvent();
-				//alert(eventList[0]);
+				updateEvent();
 				//document.getElementById("listEvents").innerHTML = "<option selected value='base'>Select Event</option>";
 			//}
 		});
@@ -74,7 +74,9 @@
    
    	function speakerCallback(sender, args) 
 	{
+		//Items returned from the query
         var enumerator2 = returnedItems2.getEnumerator();  
+		//counter to keep track of which contact we're on
 		var counter=0;
 		while (enumerator2.moveNext()) 
 		{  
@@ -194,7 +196,7 @@
 			{
 				speakerCom.push("None");
 			}	
-			 counter++;
+			 counter++;//increment counter to move onto next contact
 		}
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,9 +212,9 @@
 		 //Continue if user has selected an option
 		 else
 		 {
-				  var context;
-	  var list;
-	  var caml;
+			var context;
+			var list;
+			var caml;
 
 			 //Get the current context  
 			 context = new SP.ClientContext();  
@@ -245,21 +247,11 @@
 		{  
 			eventOrder[order]="";
 			 listItem = enumerator.get_current();
-			 
-			 //Only include session if publish is set to true
-			var eventName=JSON.stringify(listItem.get_item('Event')); //Turns the event object to string
-			var arr = eventName.split("");
-			var i=18;
-			var str="";
-			//parsing the eventName string below, method may have to be modified based on JSON.stringify output
-			while (i<arr.length-2)
-			{
-				str+=arr[i];
-				i++;
-			}
-			//str is what event session belongs to
+			var eventName=(listItem.get_item('Event')).get_lookupValue(); 
+			//gets the name of the event this session belongs to
 				
-			 if (listItem.get_item('Publish')&&(str==eventWant)) //Execute code if publish is true and session in event we want to query
+			 //Only include session if publish is set to true
+			 if (listItem.get_item('Publish')&&(eventName==eventWant)) //Execute code if publish is true and session in event we want to query
 			 {				
 				var num=((listItem.get_item('Start_x0020_DateTime')).getHours());
 				//num gets the hour of the start time
@@ -385,9 +377,7 @@
 				//var num=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
 				//var num=((listItem.get_item('End_x0020_DateTime')).getDay());
 				//var num=((listItem.get_item('End_x0020_DateTime')).getMonth()+1);
-				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());				
-				
-				//markup += 'Item ID: ' + listItem.get_id() + '<br>';  			
+				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());					
 			 }
 			 order++;//add one to the variable in order to organize the events based on start time
 		}	
@@ -405,7 +395,7 @@
 				}
 			}
 		}
-		
+		//Add each html element in the sorted array into the document to be displayed
 		for(var i=0;i<eventOrder.length;i++)
 		{
 			markup+=eventOrder[i];
@@ -426,35 +416,35 @@
       //Display the details  
 	  alert('Query failed');
    }  
-   
-   /*
-     function onFailedCallback2(sender, args) {  
-      //Formulate HTML to display details of the error  
-      markup = '<p>The request failed: <br>';  
-      markup += 'Message: ' + args.get_message() + '<br>';  
-      //Display the details 
+   function onFailedCallback3(sender, args) {  
+      //Display the details  
+	  alert('Query failed');
    }  
-   
-    function populateEvent() 
-	{
+  
+	function updateEvent()
+   {
+   	  var context3;
+	  var list3;
+	  var caml3;
 		 //Get the current context  
-		alert('wow');
-		 context = SP.ClientContext();  
+		 context3 = new SP.ClientContext();  
 		 //Get the Sessions list. Alter this code to match the name of your list  
-		 list = context.get_web().get_lists().getByTitle('Events');  
+		 list3 = context3.get_web().get_lists().getByTitle('Events');  
 		 //Create a new CAML query
-		 caml = SP.CamlQuery();  
-		 caml.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
+		 caml3 = new SP.CamlQuery();  
+		 caml3.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
 		 //Specify the query and load the list oject  
-		 returnedItems = list.getItems(caml);  
-		 alert(JSON.stringify(returnedItems));
-		 context.load(returnedItems);  
+		 returnedItems3 = list3.getItems(caml3);  
+		 context3.load(returnedItems3);  
 		 //Run the query asynchronously, passing the functions to call when a response arrives  
-		 context.executeQueryAsync(onSucceededCallback2, onFailedCallback2);  
-    }  
-	
-	function onSucceededCallback2(sender, args) 
-	{  
+		 context3.executeQueryAsync(eventCallback, onFailedCallback3);
+   }
+	   
+	function eventCallback(sender, args) 
+	{ 
+
+		alert('success');
+	/*
         //Get an enumerator for the items in the list  
         enumerator = returnedItems.getEnumerator();  
         //Loop through all the items
@@ -477,9 +467,9 @@
 
 			// add opt to end of select box (sel)
 			sel.appendChild(opt);
-			alert('wow2');
-	}*/
-	function call2()
+			alert('wow2');*/
+	}
+	function callFunction()
 	{
 		querySpeaker ();
 		queryListItems ();
@@ -488,10 +478,9 @@
 		
 </script>  
 
-<!-- Comments-->
-<!-- Make event object compatible if possible -->
-<!-- OP1 Drop down list based on events available (fix bug in populate event), move all to load location? -->
-<!-- OP2 Add in Date of Report Filing -->
+<!-- Drop down list based on events available, move all to load location? -->
+<!-- Make it easier to swap columns, have variable on top -->
+<!-- Add in Date of Report Filing -->
 <!-- Improve selection sort-->
 
 <body>
@@ -501,8 +490,8 @@
   <option value="Event 1">Event 1</option> 
   <option value="Event 2">Event 2</option>
 </select>
-<div><button id="updateButton" onclick=" querySpeaker ()">Update Events</button></div>
+<div><button id="updateButton" onclick=" updateEvent()">Update Events</button></div>
 <br><br>
-<div><button id="queryButton" onclick=" call2()">Create Report</button></div><!--Button calls queryListItems() when clicked-->
+<div><button id="queryButton" onclick=" callFunction()">Create Report</button></div><!--Button calls queryListItems() when clicked-->
 </body>
 </html>
