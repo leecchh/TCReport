@@ -243,20 +243,20 @@
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
 		 //Writing the title and styling the table
-         markup = "<style>table, th, td{border: 1px solid black;}</style><title>Report</title><h3><center>2016 Annual Meeting of the Association of Network"+
+         markup = "<style>table, th, td{border: 1px solid black;} strong{font-size:150%;}</style>"+
+		 "<title>Report</title><h3><center>2016 Annual Meeting of the Association of Network"+
 		 " Representatives</center></h3><table style='width:100%'><tr><td>Time</td>"+
-		 "<td>Location - Room</td><td>Session</td><td>Speakers</td></tr>";  
+		 "<td>Location - Room</td><td>Session</td><td>Contacts</td></tr>";  
          //Loop through all the items  
 		 var order=0;
         while (enumerator.moveNext()) 
 		{  
-			eventOrder[order]="";
+			eventOrder[order]="";//initialize string to be apended
 			 listItem = enumerator.get_current();
 			var eventName=(listItem.get_item('Event')).get_lookupValue(); 
 			//gets the name of the event this session belongs to
 				
-			 //Only include session if publish is set to true
-			 if (listItem.get_item('Publish')&&(eventName==eventWant)) //Execute code if publish is true and session in event we want to query
+			 if (eventName==eventWant) //Execute code if session in event we want to query
 			 {				
 				var num=((listItem.get_item('Start_x0020_DateTime')).getHours());
 				//num gets the hour of the start time
@@ -266,6 +266,22 @@
 				timeEvent[order]=num;
 				timeEvent[order]+=num2*1.0/60;
 				
+				//Changing the format from 24-hour to am/pm for start time
+				var ampm=" a.m.";
+				if (num>12)
+				{
+					num-=12;
+					ampm=" p.m.";
+				}
+				if (num==12)
+				{
+					ampm=" p.m.";
+				}
+				if (num==0)
+				{
+					num+=12;
+				}
+				
 				if (num.toString().length==1) {num="0"+String(num);}
 				else {num=String(num);}
 				//adds a 0 to the string num if it has 1 digit
@@ -274,13 +290,29 @@
 				else {num2=String(num2);}
 				//adds a 0 to the string num2 if it has 1 digit
 				
-				var timeStart=num+":"+num2;
+				var timeStart=num+":"+num2+ampm;
 				//make the timeStart string to represent start time
 				
 				var num3=((listItem.get_item('End_x0020_DateTime')).getHours());
 				//num3 gets the hour of the end time
 				var num4=(listItem.get_item('End_x0020_DateTime')).getMinutes();
 				//num4 gets the minute of the end time
+				
+				//Changing the format from 24-hour to am/pm for end time
+				var ampm2=" a.m.";
+				if (num3>12)
+				{
+					num3-=12;
+					ampm2=" p.m.";
+				}
+				if (num3==12)
+				{
+					ampm2=" p.m.";
+				}
+				if (num3==0)
+				{
+					num3+=12;
+				}
 				
 				if (num3.toString().length==1) {num3="0"+String(num3);}
 				else {num3=String(num3);}
@@ -290,46 +322,29 @@
 				else {num4=String(num4);}
 				//adds a 0 to the string num4 if it has 1 digit
 
-				var timeEnd=num3+":"+num4;
-				//make the timeend string to represent end time
-				
-				eventOrder[order] += "<tr><td>"+String(timeStart)+" - "+String(timeEnd)+"</td>";
-				//add the variables to the html display
+				var timeEnd=num3+":"+num4+ampm2;
+				//make the timeEnd string to represent end time
 				
 				var roomName=listItem.get_item('Room_x0020_Name');
-				if (roomName!=null)
-				{
-					//Do nothing
-				}
-				else
+				if (roomName==null)
 				{
 					roomName="None";//set room name to none
 				}
 				
 				var roomLocation=listItem.get_item('Room_x0020_Location');
-				if (roomLocation!=null)
-				{
-					eventOrder[order]+="<td>"+listItem.get_item('Room_x0020_Location')+" - "+roomName+"</td>";//Gets the location of the room of the session
-				}
-				else
-				{
-					eventOrder[order]+="<td>None - "+roomName+"</td>";//set location to none
-				}
-				
-				eventOrder[order]+="<td>"+listItem.get_item('Title')+"</td>";
-				//markup += 'Session: ' + listItem.get_item('Title') + '<br>';//Gets the session name
 				
 				var count=0;
 				var displayStr="";
 				while(listItem.get_item('Speakers')[count]!=undefined)
 				{
-					var tempStr=(listItem.get_item('Speakers')[count]).get_lookupValue();
+					var tempStr=(listItem.get_item('Speakers')[count]).get_lookupValue();//get the name of a speaker
+					//count is the number order of the speaker for a specific session
 					if (count!=0)
 					{
 						//add a line break if not the first speaker
 						displayStr+="<br>"
 					}
-					displayStr+=tempStr;
+					displayStr+="<strong> Contact: "+tempStr+"</strong>";
 					
 					//Get contact value and add to markup
 					//querySpeaker();
@@ -344,7 +359,7 @@
 						}
 					}
 					//display all the data for a specific speaker
-					displayStr+=", Job: "+speakerJob[speakerNum]+"<br>";
+					displayStr+=" <br> "+speakerJob[speakerNum]+" <br> ";
 					displayStr+="Address: "+speakerAdd[speakerNum]+"<br>";
 					displayStr+="City: "+speakerCity[speakerNum]+"<br>";
 					displayStr+="State: "+speakerState[speakerNum]+"<br>";
@@ -361,9 +376,7 @@
 					//ADD IN OTHER ATTRIBUTES
 					count++; //Increment count until there are no more contacts
 				}
-				eventOrder[order]+="<td>"+displayStr+"</td></tr>"
 				
-				eventOrder[order] += 'Source: ' + listItem.get_item('Source') + '<br>';//Gets the source for session
 				//Whether this is a group session
 				var check="";
 				if (listItem.get_item('Group_x0020_Session')==true)
@@ -375,14 +388,37 @@
 					check="No"
 				}
 				
-				eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
-				
 				//var num=((listItem.get_item('Start_x0020_DateTime')).getDay());
 				//var num=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
 				//var num=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
 				//var num=((listItem.get_item('End_x0020_DateTime')).getDay());
 				//var num=((listItem.get_item('End_x0020_DateTime')).getMonth()+1);
-				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());					
+				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());		
+				
+				//add the variables to the html display
+				//Decides the order of the columns
+				eventOrder[order] += "<tr>";//Starts the row
+				eventOrder[order]+="<td>"+String(timeStart)+" - "+String(timeEnd)+"</td>";
+				if (roomLocation!=null)//if location is not null then set the location
+				{
+					eventOrder[order]+="<td>"+listItem.get_item('Room_x0020_Location')+" - "+roomName+"</td>";//Gets the location of the room of the session
+				}
+				else
+				{
+					eventOrder[order]+="<td>None - "+roomName+"</td>";//set location to none
+				}
+				
+				var publishStr=""
+				//if field is false then write out DO NOT PUBLISH under session name
+				if (!listItem.get_item('Publish'))
+				{
+					publishStr="<br> DO NOT PUBLISH";
+				}
+				eventOrder[order]+="<td>"+listItem.get_item('Title')+publishStr+" </td>";
+				eventOrder[order]+="<td>"+displayStr+"</td>";
+				eventOrder[order]+="</tr>";//Ends the row
+				eventOrder[order] += 'Source: ' + listItem.get_item('Source') + '<br>';//Gets the source for session
+				eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
 			 }
 			 order++;//add one to the variable in order to organize the events based on start time
 		}	
@@ -483,10 +519,12 @@
 		
 </script>  
 
+<!-- am and pm -->
 <!-- Drop down list based on events available, move all to load location? -->
-<!-- Make it easier to swap columns, have variable on top -->
+<!-- Have column variables on top -->
 <!-- Add in Date of Report Filing -->
 <!-- Improve selection sort-->
+<!-- Notification for changes made (specific people) -->
 
 <body>
 <select id="listEvents">
