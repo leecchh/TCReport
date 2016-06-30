@@ -1,6 +1,7 @@
 <!--Tony Lee-->
 <!--MAKE SURE POP UP IS NOT BLOCKED-->
 <!--USE CHROME BROWSER TO ENSURE NO ERRORS-->
+<!--IF CONTACT INFO SHOWS UP AS UNDEFINED, RERUN QUERY-->
 
 <html>
 <head>
@@ -31,6 +32,9 @@
 	  //variables for ordering events by time
 	  var eventOrder=[];
 	  var timeEvent=[];
+	  var monthArr=[];
+	  var dayArr=[];
+	  
 	  //variables for speaker data to be initiated
 	  var speakerList=[];
 	  var speakerJob=[];
@@ -243,10 +247,10 @@
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
 		 //Writing the title and styling the table
-         markup = "<style>table, th, td{border: 1px solid black;} strong{font-size:150%;}</style>"+
-		 "<title>Report</title><h3><center>2016 Annual Meeting of the Association of Network"+
-		 " Representatives</center></h3><table style='width:100%'><tr><td>Time</td>"+
-		 "<td>Location - Room</td><td>Session</td><td>Contacts</td></tr>";  
+         markup = "<style>table, th, td{border: 2px solid black;border-collapse: collapse;} strong{font-size:120%;} th{font-size:120%}</style>"+
+		 "<title>Report</title><h2><center>2016 Annual Meeting of the Association of Network"+
+		 " Representatives</center></h2><table style='width:100%'><tr><th>Time</th>"+
+		 "<th style='width:350px'>Session</th><th>Contacts</th></tr>";  
          //Loop through all the items  
 		 var order=0;
         while (enumerator.moveNext()) 
@@ -255,6 +259,10 @@
 			 listItem = enumerator.get_current();
 			var eventName=(listItem.get_item('Event')).get_lookupValue(); 
 			//gets the name of the event this session belongs to
+			
+			//Stores the day and the month into two separate arrays
+			dayArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
+			monthArr[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
 				
 			 if (eventName==eventWant) //Execute code if session in event we want to query
 			 {				
@@ -366,14 +374,14 @@
 					displayStr+="Phone: "+speakerPhone[speakerNum]+"<br>";
 					displayStr+="Fax: "+speakerFax[speakerNum]+"<br>";
 					displayStr+="Email: "+speakerEmail[speakerNum]+"<br>";
-					displayStr+="Designations: "+speakerDes[speakerNum]+"<br>";
-					displayStr+="FR: "+speakerFR[speakerNum]+"<br>";
-					displayStr+="NO: "+speakerNO[speakerNum]+"<br>";
-					displayStr+="DNO: "+speakerDNO[speakerNum]+"<br>";
-					displayStr+="Contact Type: "+speakerContact[speakerNum]+"<br>";
-					displayStr+="Agreement: "+speakerAgree[speakerNum]+"<br>";
-					displayStr+="Compliance: "+speakerCom[speakerNum]+"<br>";
-					//ADD IN OTHER ATTRIBUTES
+					//displayStr+="Designations: "+speakerDes[speakerNum]+"<br>";
+					//displayStr+="FR: "+speakerFR[speakerNum]+"<br>";
+					//displayStr+="NO: "+speakerNO[speakerNum]+"<br>";
+					//displayStr+="DNO: "+speakerDNO[speakerNum]+"<br>";
+					//displayStr+="Contact Type: "+speakerContact[speakerNum]+"<br>";
+					//displayStr+="Agreement: "+speakerAgree[speakerNum]+"<br>";
+					//displayStr+="Compliance: "+speakerCom[speakerNum]+"<br>";
+
 					count++; //Increment count until there are no more contacts
 				}
 				
@@ -398,44 +406,47 @@
 				//add the variables to the html display
 				//Decides the order of the columns
 				eventOrder[order] += "<tr>";//Starts the row
-				eventOrder[order]+="<td>"+String(timeStart)+" - "+String(timeEnd)+"</td>";
-				if (roomLocation!=null)//if location is not null then set the location
-				{
-					eventOrder[order]+="<td>"+listItem.get_item('Room_x0020_Location')+" - "+roomName+"</td>";//Gets the location of the room of the session
-				}
-				else
-				{
-					eventOrder[order]+="<td>None - "+roomName+"</td>";//set location to none
-				}
-				
-				var publishStr=""
+							
+				var publishStr="";
 				//if field is false then write out DO NOT PUBLISH under session name
 				if (!listItem.get_item('Publish'))
 				{
 					publishStr="<br> DO NOT PUBLISH";
 				}
-				eventOrder[order]+="<td>"+listItem.get_item('Title')+publishStr+" </td>";
-				eventOrder[order]+="<td>"+displayStr+"</td>";
+				
+				eventOrder[order]+="<td><strong>"+String(timeStart)+" - "+String(timeEnd)+" <br> </strong>"+listItem.get_item('Source')+monthArr[order]+"-"+dayArr[order]+publishStr+"</td>";
+				//Prints out the time, source, and whether it should be published
+				
+				var locationStr="";
+				
+				if (roomLocation!=null)//if location is not null then set the location
+				{
+					locationStr="<br>"+listItem.get_item('Room_x0020_Location')+" - "+roomName;
+				}
+				eventOrder[order]+="<td><strong>"+listItem.get_item('Title')+"</strong>"+locationStr+" </td>";
+				eventOrder[order]+="<td>"+displayStr+"</td>";//shows information of the contact
 				eventOrder[order]+="</tr>";//Ends the row
-				eventOrder[order] += 'Source: ' + listItem.get_item('Source') + '<br>';//Gets the source for session
-				eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
+				//eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
 			 }
 			 order++;//add one to the variable in order to organize the events based on start time
 		}	
+		
 		
 		//Selection sort O(n^2) in terms of start time, can be improved for large data sets
 		for(var a=0;a<timeEvent.length-1;a++)
 		{
 			for(var b=a+1;b<timeEvent.length;b++)
 			{
-				if (timeEvent[a]>timeEvent[b])
+				if (timeEvent[a]+dayArr[a]*24+monthArr[a]*24*31>timeEvent[b]+dayArr[b]*24+monthArr[b]*24*31)
 				{
 					var temp=eventOrder[a];
 					eventOrder[a]=eventOrder[b];
 					eventOrder[b]=temp;
 				}
 			}
-		}
+		}//CODE NEEDS TO BE FIXED, LOGIC ERROR
+
+		//var currentDate=dayArr[a]+monthArr[a]*31;
 		//Add each html element in the sorted array into the document to be displayed
 		for(var i=0;i<eventOrder.length;i++)
 		{
@@ -515,15 +526,13 @@
 		querySpeaker ();
 		queryListItems ();
 	}
+</script>
 
-		
-</script>  
-
-<!-- am and pm -->
+<!-- Add in Date of Report Filing, new table for each date -->
+<!-- Style the Table -->
 <!-- Drop down list based on events available, move all to load location? -->
-<!-- Have column variables on top -->
-<!-- Add in Date of Report Filing -->
 <!-- Improve selection sort-->
+<!-- Have column variables on top -->
 <!-- Notification for changes made (specific people) -->
 
 <body>
