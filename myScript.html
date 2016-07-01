@@ -30,6 +30,7 @@
 	  var timeEvent=[];
 	  var monthArr=[];
 	  var dayArr=[];
+	  var dowArr=[];
 	  
 	  //variables for speaker data to be initiated
 	  var speakerList=[];
@@ -48,6 +49,7 @@
 	  var speakerAgree=[];
 	  var speakerCom=[];
 	  
+	  //The following code runs as soon as the page is loaded
 	  $(window).load( function() {
 			//if (populateEvent()!="Failed")
 			//{
@@ -58,6 +60,7 @@
 			//}
 		});
 		
+	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays///////////////////////////////////////////////////////////
 	function querySpeaker()
    {
    	  var context2;
@@ -205,7 +208,7 @@
 		}
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      //This function loads the list and runs the query asynchronously  
+      //This function loads the list and runs the query to produce the table
       function queryListItems() { 
 		var yourSelect = document.getElementById( "listEvents" );	
 		//Check if user has selected an event to generate report
@@ -256,7 +259,8 @@
 			//gets the name of the event this session belongs to
 			
 			//Stores the day and the month into two separate arrays
-			dayArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
+			dowArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
+			dayArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDate());
 			monthArr[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
 			
 			var num=((listItem.get_item('Start_x0020_DateTime')).getHours());
@@ -453,6 +457,11 @@
 					monthArr[a]=monthArr[b];
 					monthArr[b]=temp4;
 					//Flip the month
+					
+					var temp5=dowArr[a];
+					dowArr[a]=dowArr[b];
+					dowArr[b]=temp5;
+					//Flip the day of week
 				}
 			}
 		}
@@ -465,6 +474,8 @@
 			{
 				var dayStr=dayArr[i];
 				var monthStr;
+				var dowStr;
+				//Convert the number into a month string to be displayed
 				if (monthArr[i]==1) {monthStr="January";}
 				else if (monthArr[i]==2) {monthStr="February";}
 				else if (monthArr[i]==3) {monthStr="March";}
@@ -477,7 +488,17 @@
 				else if (monthArr[i]==10) {monthStr="October";}
 				else if (monthArr[i]==11) {monthStr="November";}
 				else if (monthArr[i]==12) {monthStr="December";}
-				markup+="<table style='width:100%'><tr><th colspan='3'>"+monthStr+" - "+dayStr+"</th></tr><tr><th>Time</th>"+
+				
+				//Convert the number into a day of week string to be displayed
+				if (dowArr[i]==1) {dowStr="Monday";}
+				else if (dowArr[i]==2) {dowStr="Tuesday";}
+				else if (dowArr[i]==3) {dowStr="Wednesday";}
+				else if (dowArr[i]==4) {dowStr="Thursday";}
+				else if (dowArr[i]==5) {dowStr="Friday";}
+				else if (dowArr[i]==6) {dowStr="Saturday";}
+				else if (dowArr[i]==0) {dowStr="Sunday";}
+				
+				markup+="<table style='width:100%'><tr><th colspan='3'>"+dowStr+", "+monthStr+" "+dayStr+"</th></tr><tr><th>Time</th>"+
 			 "<th style='width:350px'>Session</th><th>Contacts</th></tr>";
 				
 				markup+=eventOrder[i];
@@ -566,10 +587,10 @@
 	}
 </script>
 
-<!-- Style the Table -->
+<!-- Format margin of the last row -->
+<!-- Add in end date for events with different start/end dates -->
 <!-- Drop down list based on events available, move all to load location? -->
 <!-- Improve selection sort-->
-<!-- Have column variables on top -->
 <!-- Notification for changes made (specific people) -->
 
 <body>
