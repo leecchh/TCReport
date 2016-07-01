@@ -92,6 +92,7 @@
 			 speakerList.push(listItem2.get_item('Title'));
 			 //Store each type of data in an array for each contact, grouped by the type of data
 			 //For example speakerList[0] would be the name of the first contact, speakerList[1] is name of second contact
+			 //if data is not null then push into array, otherwise push "none" into array
 			 if (listItem2.get_item('Job_x0020_Title')!=null)
 			 {
 				speakerJob.push(listItem2.get_item('Job_x0020_Title'));
@@ -245,20 +246,20 @@
 		var enumerator;
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
-		 //Writing the title and styling the table
+		 //Writing the title and styling it
          markup = "<style>table, th, td{border: 2px solid black;border-collapse: collapse;} strong{font-size:120%;} th{font-size:120%}</style>"+
 		 "<title>Report</title><h2><center>2016 Annual Meeting of the Association of Network"+
 		 " Representatives</center></h2>";  
          //Loop through all the items  
 		 var order=0;
-        while (enumerator.moveNext()) 
+        while (enumerator.moveNext()) //for each session possible
 		{  
 			eventOrder[order]="";//initialize string to be apended
 			 listItem = enumerator.get_current();
 			var eventName=(listItem.get_item('Event')).get_lookupValue(); 
 			//gets the name of the event this session belongs to
 			
-			//Stores the day and the month into two separate arrays
+			//Stores the day of week, day, and the month into separate arrays
 			dowArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
 			dayArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDate());
 			monthArr[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
@@ -269,7 +270,7 @@
 			//num2 get the minute of the start time
 			
 			timeEvent[order]=num;
-			timeEvent[order]+=num2*1.0/60;
+			timeEvent[order]+=num2*1.0/60;//hour with respect to midnight to help order events later
 				
 			 if (eventName==eventWant) //Execute code if session in event we want to query
 			 {				
@@ -338,11 +339,12 @@
 					roomName="None";//set room name to none
 				}
 				
+				//gets the room location
 				var roomLocation=listItem.get_item('Room_x0020_Location');
 				
 				var count=0;
-				var displayStr="";
-				while(listItem.get_item('Speakers')[count]!=undefined)
+				var displayStr="";//string of contacts to be displayed
+				while(listItem.get_item('Speakers')[count]!=undefined)//iterate through each contact
 				{
 					var tempStr=(listItem.get_item('Speakers')[count]).get_lookupValue();//get the name of a speaker
 					//count is the number order of the speaker for a specific session
@@ -393,16 +395,9 @@
 				else
 				{
 					check="No"
-				}
+				}	
 				
-				//var num=((listItem.get_item('Start_x0020_DateTime')).getDay());
-				//var num=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
-				//var num=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
-				//var num=((listItem.get_item('End_x0020_DateTime')).getDay());
-				//var num=((listItem.get_item('End_x0020_DateTime')).getMonth()+1);
-				//var num=((listItem.get_item('End_x0020_DateTime')).getFullYear());		
-				
-				//add the variables to the html display
+				//add the variables to eventOrder
 				//Decides the order of the columns
 				eventOrder[order] += "<tr>";//Starts the row
 							
@@ -413,7 +408,7 @@
 					publishStr="<br> DO NOT PUBLISH";
 				}
 				
-				eventOrder[order]+="<td><strong>"+String(timeStart)+" - "+String(timeEnd)+" <br> </strong>"+listItem.get_item('Source')+monthArr[order]+"-"+dayArr[order]+publishStr+"</td>";
+				eventOrder[order]+="<td><strong>"+String(timeStart)+" - "+String(timeEnd)+" <br> </strong>"+listItem.get_item('Source')+publishStr+"</td>";
 				//Prints out the time, source, and whether it should be published
 				
 				var locationStr="";
@@ -508,7 +503,7 @@
 					markup+=eventOrder[i];
 				}
 			
-				markup+="</table><br>";
+				markup+="</table><br><br>";
 			}
 		}
 	  //open new window, MAKE SURE POP UP WINDOW IS NOT BLOCKED
