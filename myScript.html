@@ -25,10 +25,6 @@
 	  var sel;
 	  var opt;
 	  
-	  //variables for ordering of colm
-	  //var timeArr=[];
-	  //var locationArr=[];
-	  
 	  //variables for ordering events by time
 	  var eventOrder=[];
 	  var timeEvent=[];
@@ -249,8 +245,7 @@
 		 //Writing the title and styling the table
          markup = "<style>table, th, td{border: 2px solid black;border-collapse: collapse;} strong{font-size:120%;} th{font-size:120%}</style>"+
 		 "<title>Report</title><h2><center>2016 Annual Meeting of the Association of Network"+
-		 " Representatives</center></h2><table style='width:100%'><tr><th>Time</th>"+
-		 "<th style='width:350px'>Session</th><th>Contacts</th></tr>";  
+		 " Representatives</center></h2>";  
          //Loop through all the items  
 		 var order=0;
         while (enumerator.moveNext()) 
@@ -263,17 +258,17 @@
 			//Stores the day and the month into two separate arrays
 			dayArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
 			monthArr[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
+			
+			var num=((listItem.get_item('Start_x0020_DateTime')).getHours());
+			//num gets the hour of the start time
+			var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
+			//num2 get the minute of the start time
+			
+			timeEvent[order]=num;
+			timeEvent[order]+=num2*1.0/60;
 				
 			 if (eventName==eventWant) //Execute code if session in event we want to query
 			 {				
-				var num=((listItem.get_item('Start_x0020_DateTime')).getHours());
-				//num gets the hour of the start time
-				var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
-				//num2 get the minute of the start time
-				
-				timeEvent[order]=num;
-				timeEvent[order]+=num2*1.0/60;
-				
 				//Changing the format from 24-hour to am/pm for start time
 				var ampm=" a.m.";
 				if (num>12)
@@ -442,15 +437,58 @@
 					var temp=eventOrder[a];
 					eventOrder[a]=eventOrder[b];
 					eventOrder[b]=temp;
+					//Flip the order html is made
+					
+					var temp2=timeEvent[a];
+					timeEvent[a]=timeEvent[b];
+					timeEvent[b]=temp2;
+					//Flip the hour and minute
+					
+					var temp3=dayArr[a];
+					dayArr[a]=dayArr[b];
+					dayArr[b]=temp3;
+					//Flip the day
+					
+					var temp4=monthArr[a];
+					monthArr[a]=monthArr[b];
+					monthArr[b]=temp4;
+					//Flip the month
 				}
 			}
-		}//CODE NEEDS TO BE FIXED, LOGIC ERROR
+		}
 
 		//var currentDate=dayArr[a]+monthArr[a]*31;
 		//Add each html element in the sorted array into the document to be displayed
 		for(var i=0;i<eventOrder.length;i++)
 		{
-			markup+=eventOrder[i];
+			if (eventOrder[i]!="")
+			{
+				var dayStr=dayArr[i];
+				var monthStr;
+				if (monthArr[i]==1) {monthStr="January";}
+				else if (monthArr[i]==2) {monthStr="February";}
+				else if (monthArr[i]==3) {monthStr="March";}
+				else if (monthArr[i]==4) {monthStr="April";}
+				else if (monthArr[i]==5) {monthStr="May";}
+				else if (monthArr[i]==6) {monthStr="June";}
+				else if (monthArr[i]==7) {monthStr="July";}
+				else if (monthArr[i]==8) {monthStr="August";}
+				else if (monthArr[i]==9) {monthStr="September";}
+				else if (monthArr[i]==10) {monthStr="October";}
+				else if (monthArr[i]==11) {monthStr="November";}
+				else if (monthArr[i]==12) {monthStr="December";}
+				markup+="<table style='width:100%'><tr><th colspan='3'>"+monthStr+" - "+dayStr+"</th></tr><tr><th>Time</th>"+
+			 "<th style='width:350px'>Session</th><th>Contacts</th></tr>";
+				
+				markup+=eventOrder[i];
+				while (i<eventOrder.length-1 && dayArr[i]==dayArr[i+1] && monthArr[i]==monthArr[i+1])
+				{
+					i++;
+					markup+=eventOrder[i];
+				}
+			
+				markup+="</table><br>";
+			}
 		}
 	  //open new window, MAKE SURE POP UP WINDOW IS NOT BLOCKED
 		newwindow=window.open();
@@ -528,7 +566,6 @@
 	}
 </script>
 
-<!-- Add in Date of Report Filing, new table for each date -->
 <!-- Style the Table -->
 <!-- Drop down list based on events available, move all to load location? -->
 <!-- Improve selection sort-->
