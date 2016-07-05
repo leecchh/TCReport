@@ -28,26 +28,12 @@
 	  //variables for ordering events by time
 	  var eventOrder=[];
 	  var timeEvent=[];
-	  var monthArr=[];
-	  var dayArr=[];
-	  var dowArr=[];
+	  var monthArray=[];
+	  var dayArray=[];
+	  var dayOfWeekArray=[];
 	  
-	  //variables for speaker data to be initiated
-	  var speakerList=[];
-	  var speakerJob=[];
-	  var speakerAdd=[];
-	  var speakerCity=[];
-	  var speakerState=[];
-	  var speakerPhone=[];
-	  var speakerFax=[];
-	  var speakerEmail=[];
-	  var speakerDes=[];
-	  var speakerFR=[];
-	  var speakerNO=[];
-	  var speakerDNO=[];
-	  var speakerContact=[];
-	  var speakerAgree=[];
-	  var speakerCom=[];
+	  //Array of speaker objects containing speaker information
+	  var speakerObjectList=[];
 	  
 	  //The following code runs as soon as the page is loaded
 	  $(window).load( function() {
@@ -55,7 +41,7 @@
 			//{
 				var selectHtml="";
 				selectHtml+="";
-				updateEvent();
+				//updateEvent();
 				//document.getElementById("listEvents").innerHTML = "<option selected value='base'>Select Event</option>";
 			//}
 		});
@@ -89,122 +75,27 @@
 		while (enumerator2.moveNext()) 
 		{  
 			 listItem2 = enumerator2.get_current();
-			 speakerList.push(listItem2.get_item('Title'));
 			 //Store each type of data in an array for each contact, grouped by the type of data
 			 //For example speakerList[0] would be the name of the first contact, speakerList[1] is name of second contact
-			 //if data is not null then push into array, otherwise push "none" into array
-			 if (listItem2.get_item('Job_x0020_Title')!=null)
-			 {
-				speakerJob.push(listItem2.get_item('Job_x0020_Title'));
-			 }
-			else
-			{
-				speakerJob.push("None");
-			}
-			if(listItem2.get_item('Street_x0020_Address')!=null)
-			{
-				speakerAdd.push(listItem2.get_item('Street_x0020_Address'));
-			}
-			else
-			{
-				speakerAdd.push("None");
-			}
-			if(listItem2.get_item('City')!=null)
-			{
-				speakerCity.push(listItem2.get_item('City'));
-			}
-			else
-			{
-				speakerCity.push("None");
-			}
-			if(listItem2.get_item('State')!=null)
-			{
-				speakerState.push(listItem2.get_item('State'));
-			}
-			else
-			{
-				speakerState.push("None");
-			}
-			if(listItem2.get_item('Phone')!=null)
-			{
-				speakerPhone.push(listItem2.get_item('Phone'));
-			}
-			else
-			{
-				speakerPhone.push("None");
-			}
-			if(listItem2.get_item('Fax')!=null)
-			{
-				speakerFax.push(listItem2.get_item('Fax'));
-			}
-			else
-			{
-				speakerFax.push("None");
-			}
-			if(listItem2.get_item('E_x002d_Mail_x0020_Address')!=null)
-			{
-				speakerEmail.push(listItem2.get_item('E_x002d_Mail_x0020_Address'));
-			}
-			else
-			{
-				speakerEmail.push("None");
-			}
-			if(listItem2.get_item('Designations')!=null)
-			{
-				speakerDes.push(listItem2.get_item('Designations'));
-			}
-			else
-			{
-				speakerDes.push("None");
-			}
-			if(listItem2.get_item('FR_x0020_Number')!=null)
-			{
-				speakerFR.push(listItem2.get_item('FR_x0020_Number'));
-			}
-			else
-			{
-				speakerFR.push("None");
-			}
-			if(listItem2.get_item('NO_x0020_Number')!=null)
-			{
-				speakerNO.push(listItem2.get_item('NO_x0020_Number'));
-			}
-			else
-			{
-				speakerNO.push("None");
-			}
-			if(listItem2.get_item('DNO_x0020_Number')!=null)
-			{
-				speakerDNO.push(listItem2.get_item('DNO_x0020_Number'));
-			}
-			else
-			{
-				speakerDNO.push("None");
-			}
-			if(listItem2.get_item('Contact_x0020_Type')!=null)
-			{
-				speakerContact.push(listItem2.get_item('Contact_x0020_Type'));
-			}
-			else
-			{
-				speakerContact.push("None");
-			}
-			if(listItem2.get_item('Speaker_x0020_agreement')!=null)
-			{
-				speakerAgree.push(listItem2.get_item('Speaker_x0020_agreement'));
-			}
-			else
-			{
-				speakerAgree.push("None");
-			}	
-			if(listItem2.get_item('Speaker_x0020_Compliance')!=null)
-			{
-				speakerCom.push(listItem2.get_item('Speaker_x0020_Compliance'));
-			}
-			else
-			{
-				speakerCom.push("None");
-			}	
+			 
+			 var tempObj=new Object();
+			 tempObj.Name=listItem2.get_item('Title');
+			 tempObj.Job=listItem2.get_item('Job_x0020_Title');
+			 tempObj.Address=listItem2.get_item('Street_x0020_Address');
+			 tempObj.City=listItem2.get_item('City');
+			 tempObj.State=listItem2.get_item('State');
+			 tempObj.Phone=listItem2.get_item('Phone');
+			 tempObj.Fax=listItem2.get_item('Fax');
+			 tempObj.Email=listItem2.get_item('E_x002d_Mail_x0020_Address');
+			 tempObj.Designations=listItem2.get_item('Designations');
+			 tempObj.FR=listItem2.get_item('FR_x0020_Number');
+			 tempObj.NO=listItem2.get_item('NO_x0020_Number');
+			 tempObj.DNO=listItem2.get_item('DNO_x0020_Number');
+			 tempObj.Contact=listItem2.get_item('Contact_x0020_Type');
+			 tempObj.Agreement=listItem2.get_item('Speaker_x0020_agreement');
+			 tempObj.Compliance=listItem2.get_item('Speaker_x0020_Compliance');
+			 speakerObjectList.push(tempObj);
+
 			 counter++;//increment counter to move onto next contact
 		}
 	}
@@ -247,7 +138,7 @@
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
 		 //Writing the title and styling it
-         markup = "<style>table, th, td{border: 2px solid black;border-collapse: collapse;} strong{font-size:120%;} th{font-size:120%}</style>"+
+         markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>"+
 		 "<title>Report</title><h2><center>2016 Annual Meeting of the Association of Network"+
 		 " Representatives</center></h2>";  
          //Loop through all the items  
@@ -260,77 +151,77 @@
 			//gets the name of the event this session belongs to
 			
 			//Stores the day of week, day, and the month into separate arrays
-			dowArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
-			dayArr[order]=((listItem.get_item('Start_x0020_DateTime')).getDate());
-			monthArr[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
+			dayOfWeekArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
+			dayArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDate());
+			monthArray[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
 			
-			var num=((listItem.get_item('Start_x0020_DateTime')).getHours());
-			//num gets the hour of the start time
-			var num2=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
-			//num2 get the minute of the start time
+			var startHour=((listItem.get_item('Start_x0020_DateTime')).getHours());
+			//startHour gets the hour of the start time
+			var startMinute=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
+			//startMinute get the minute of the start time
 			
-			timeEvent[order]=num;
-			timeEvent[order]+=num2*1.0/60;//hour with respect to midnight to help order events later
+			timeEvent[order]=startHour;
+			timeEvent[order]+=startMinute*1.0/60;//hour with respect to midnight to help order events later
 				
 			 if (eventName==eventWant) //Execute code if session in event we want to query
 			 {				
 				//Changing the format from 24-hour to am/pm for start time
-				var ampm=" a.m.";
-				if (num>12)
+				var ampmString=" a.m.";
+				if (startHour>12)
 				{
-					num-=12;
-					ampm=" p.m.";
+					startHour-=12;
+					ampmString=" p.m.";
 				}
-				if (num==12)
+				if (startHour==12)
 				{
-					ampm=" p.m.";
+					ampmString=" p.m.";
 				}
-				if (num==0)
+				if (startHour==0)
 				{
-					num+=12;
+					startHour+=12;
 				}
 				
-				if (num.toString().length==1) {num="0"+String(num);}
-				else {num=String(num);}
-				//adds a 0 to the string num if it has 1 digit
+				if (startHour.toString().length==1) {startHour="0"+String(startHour);}
+				else {startHour=String(startHour);}
+				//adds a 0 to the string startHour if it has 1 digit
 				
-				if (num2.toString().length==1) {num2="0"+String(num2);}
-				else {num2=String(num2);}
-				//adds a 0 to the string num2 if it has 1 digit
+				if (startMinute.toString().length==1) {startMinute="0"+String(startMinute);}
+				else {startMinute=String(startMinute);}
+				//adds a 0 to the string startMinute if it has 1 digit
 				
-				var timeStart=num+":"+num2+ampm;
+				var timeStart=startHour+":"+startMinute+ampmString;
 				//make the timeStart string to represent start time
 				
-				var num3=((listItem.get_item('End_x0020_DateTime')).getHours());
-				//num3 gets the hour of the end time
-				var num4=(listItem.get_item('End_x0020_DateTime')).getMinutes();
-				//num4 gets the minute of the end time
+				var endHour=((listItem.get_item('End_x0020_DateTime')).getHours());
+				//endHour gets the hour of the end time
+				var endMinute=(listItem.get_item('End_x0020_DateTime')).getMinutes();
+				//endMinute gets the minute of the end time
 				
 				//Changing the format from 24-hour to am/pm for end time
-				var ampm2=" a.m.";
-				if (num3>12)
+				var ampmString2=" a.m.";
+				if (endHour>12)
 				{
-					num3-=12;
-					ampm2=" p.m.";
+					endHour-=12;
+					ampmString2=" p.m.";
 				}
-				if (num3==12)
+				if (endHour==12)
 				{
-					ampm2=" p.m.";
+					ampmString2=" p.m.";
 				}
-				if (num3==0)
+				if (endHour==0)
 				{
-					num3+=12;
+					endHour+=12;
 				}
 				
-				if (num3.toString().length==1) {num3="0"+String(num3);}
-				else {num3=String(num3);}
-				//adds a 0 to the string num3 if it has 1 digit
+				if (endHour.toString().length==1) {endHour="0"+String(endHour);}
+				else {endHour=String(endHour);}
+				//adds a 0 to the string endHour if it has 1 digit
 				
-				if (num4.toString().length==1) {num4="0"+String(num4);}
-				else {num4=String(num4);}
-				//adds a 0 to the string num4 if it has 1 digit
+				if (endMinute.toString().length==1) {endMinute="0"+String(endMinute);}
+				else {endMinute=String(endMinute);}
+				//adds a 0 to the string endMinute if it has 1 digit
 
-				var timeEnd=num3+":"+num4+ampm2;
+				var timeEnd=endHour+":"+endMinute+ampmString2;
 				//make the timeEnd string to represent end time
 				
 				var roomName=listItem.get_item('Room_x0020_Name');
@@ -343,7 +234,7 @@
 				var roomLocation=listItem.get_item('Room_x0020_Location');
 				
 				var count=0;
-				var displayStr="";//string of contacts to be displayed
+				var contactString="";//string of contacts to be displayed
 				while(listItem.get_item('Speakers')[count]!=undefined)//iterate through each contact
 				{
 					var tempStr=(listItem.get_item('Speakers')[count]).get_lookupValue();//get the name of a speaker
@@ -351,37 +242,38 @@
 					if (count!=0)
 					{
 						//add a line break if not the first speaker
-						displayStr+="<br>"
+						contactString+="<br>"
 					}
-					displayStr+="<strong> Contact: "+tempStr+"</strong>";
+					contactString+="<strong> Contact: "+tempStr+"</strong>";
 					
 					//Get contact value and add to markup
 					//querySpeaker();
 					var speakerNum=-1;
-					for(var i=0;i<speakerList.length;i++)
+					for(var i=0;i<speakerObjectList.length;i++)
 					{
 						//find the index of the speaker stored in the array
-						if(speakerList[i]==tempStr)
+						if(speakerObjectList[i].Name==tempStr)
 						{
 							speakerNum=i;
 							break;
 						}
 					}
 					//display all the data for a specific speaker
-					displayStr+=" <br> "+speakerJob[speakerNum]+" <br> ";
-					displayStr+="Address: "+speakerAdd[speakerNum]+"<br>";
-					displayStr+="City: "+speakerCity[speakerNum]+"<br>";
-					displayStr+="State: "+speakerState[speakerNum]+"<br>";
-					displayStr+="Phone: "+speakerPhone[speakerNum]+"<br>";
-					displayStr+="Fax: "+speakerFax[speakerNum]+"<br>";
-					displayStr+="Email: "+speakerEmail[speakerNum]+"<br>";
-					//displayStr+="Designations: "+speakerDes[speakerNum]+"<br>";
-					//displayStr+="FR: "+speakerFR[speakerNum]+"<br>";
-					//displayStr+="NO: "+speakerNO[speakerNum]+"<br>";
-					//displayStr+="DNO: "+speakerDNO[speakerNum]+"<br>";
-					//displayStr+="Contact Type: "+speakerContact[speakerNum]+"<br>";
-					//displayStr+="Agreement: "+speakerAgree[speakerNum]+"<br>";
-					//displayStr+="Compliance: "+speakerCom[speakerNum]+"<br>";
+					contactString+=" <br> "+speakerObjectList[speakerNum].Job+" <br> ";
+					contactString+="Address: "+speakerObjectList[speakerNum].Address+"<br>";
+					contactString+="City: "+speakerObjectList[speakerNum].City+"<br>";
+					contactString+="State: "+speakerObjectList[speakerNum].State+"<br>";
+					contactString+="Phone: "+speakerObjectList[speakerNum].Phone+"<br>";
+					contactString+="Fax: "+speakerObjectList[speakerNum].Fax+"<br>";
+					contactString+="Email: "+speakerObjectList[speakerNum].Email+"<br>";
+
+					//contactString+="Designations: "+speakerDesignation[speakerNum]+"<br>";
+					//contactString+="FR: "+speakerFR[speakerNum]+"<br>";
+					//contactString+="NO: "+speakerNO[speakerNum]+"<br>";
+					//contactString+="DNO: "+speakerDNO[speakerNum]+"<br>";
+					//contactString+="Contact Type: "+speakerContact[speakerNum]+"<br>";
+					//contactString+="Agreement: "+speakerAgree[speakerNum]+"<br>";
+					//contactString+="Compliance: "+speakerCom[speakerNum]+"<br>";
 
 					count++; //Increment count until there are no more contacts
 				}
@@ -418,7 +310,7 @@
 					locationStr="<br>"+listItem.get_item('Room_x0020_Location')+" - "+roomName;
 				}
 				eventOrder[order]+="<td><strong>"+listItem.get_item('Title')+"</strong>"+locationStr+" </td>";
-				eventOrder[order]+="<td>"+displayStr+"</td>";//shows information of the contact
+				eventOrder[order]+="<td>"+contactString+"</td>";//shows information of the contact
 				eventOrder[order]+="</tr>";//Ends the row
 				//eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
 			 }
@@ -431,7 +323,7 @@
 		{
 			for(var b=a+1;b<timeEvent.length;b++)
 			{
-				if (timeEvent[a]+dayArr[a]*24+monthArr[a]*24*31>timeEvent[b]+dayArr[b]*24+monthArr[b]*24*31)
+				if (timeEvent[a]+dayArray[a]*24+monthArray[a]*24*31>timeEvent[b]+dayArray[b]*24+monthArray[b]*24*31)
 				{
 					var temp=eventOrder[a];
 					eventOrder[a]=eventOrder[b];
@@ -443,61 +335,61 @@
 					timeEvent[b]=temp2;
 					//Flip the hour and minute
 					
-					var temp3=dayArr[a];
-					dayArr[a]=dayArr[b];
-					dayArr[b]=temp3;
+					var temp3=dayArray[a];
+					dayArray[a]=dayArray[b];
+					dayArray[b]=temp3;
 					//Flip the day
 					
-					var temp4=monthArr[a];
-					monthArr[a]=monthArr[b];
-					monthArr[b]=temp4;
+					var temp4=monthArray[a];
+					monthArray[a]=monthArray[b];
+					monthArray[b]=temp4;
 					//Flip the month
 					
-					var temp5=dowArr[a];
-					dowArr[a]=dowArr[b];
-					dowArr[b]=temp5;
+					var temp5=dayOfWeekArray[a];
+					dayOfWeekArray[a]=dayOfWeekArray[b];
+					dayOfWeekArray[b]=temp5;
 					//Flip the day of week
 				}
 			}
 		}
 
-		//var currentDate=dayArr[a]+monthArr[a]*31;
+		//var currentDate=dayArray[a]+monthArray[a]*31;
 		//Add each html element in the sorted array into the document to be displayed
 		for(var i=0;i<eventOrder.length;i++)
 		{
 			if (eventOrder[i]!="")
 			{
-				var dayStr=dayArr[i];
+				var dayStr=dayArray[i];
 				var monthStr;
 				var dowStr;
 				//Convert the number into a month string to be displayed
-				if (monthArr[i]==1) {monthStr="January";}
-				else if (monthArr[i]==2) {monthStr="February";}
-				else if (monthArr[i]==3) {monthStr="March";}
-				else if (monthArr[i]==4) {monthStr="April";}
-				else if (monthArr[i]==5) {monthStr="May";}
-				else if (monthArr[i]==6) {monthStr="June";}
-				else if (monthArr[i]==7) {monthStr="July";}
-				else if (monthArr[i]==8) {monthStr="August";}
-				else if (monthArr[i]==9) {monthStr="September";}
-				else if (monthArr[i]==10) {monthStr="October";}
-				else if (monthArr[i]==11) {monthStr="November";}
-				else if (monthArr[i]==12) {monthStr="December";}
+				if (monthArray[i]==1) {monthStr="January";}
+				else if (monthArray[i]==2) {monthStr="February";}
+				else if (monthArray[i]==3) {monthStr="March";}
+				else if (monthArray[i]==4) {monthStr="April";}
+				else if (monthArray[i]==5) {monthStr="May";}
+				else if (monthArray[i]==6) {monthStr="June";}
+				else if (monthArray[i]==7) {monthStr="July";}
+				else if (monthArray[i]==8) {monthStr="August";}
+				else if (monthArray[i]==9) {monthStr="September";}
+				else if (monthArray[i]==10) {monthStr="October";}
+				else if (monthArray[i]==11) {monthStr="November";}
+				else if (monthArray[i]==12) {monthStr="December";}
 				
 				//Convert the number into a day of week string to be displayed
-				if (dowArr[i]==1) {dowStr="Monday";}
-				else if (dowArr[i]==2) {dowStr="Tuesday";}
-				else if (dowArr[i]==3) {dowStr="Wednesday";}
-				else if (dowArr[i]==4) {dowStr="Thursday";}
-				else if (dowArr[i]==5) {dowStr="Friday";}
-				else if (dowArr[i]==6) {dowStr="Saturday";}
-				else if (dowArr[i]==0) {dowStr="Sunday";}
+				if (dayOfWeekArray[i]==1) {dowStr="Monday";}
+				else if (dayOfWeekArray[i]==2) {dowStr="Tuesday";}
+				else if (dayOfWeekArray[i]==3) {dowStr="Wednesday";}
+				else if (dayOfWeekArray[i]==4) {dowStr="Thursday";}
+				else if (dayOfWeekArray[i]==5) {dowStr="Friday";}
+				else if (dayOfWeekArray[i]==6) {dowStr="Saturday";}
+				else if (dayOfWeekArray[i]==0) {dowStr="Sunday";}
 				
 				markup+="<table style='width:100%'><tr><th colspan='3'>"+dowStr+", "+monthStr+" "+dayStr+"</th></tr><tr><th>Time</th>"+
 			 "<th style='width:350px'>Session</th><th>Contacts</th></tr>";
 				
 				markup+=eventOrder[i];
-				while (i<eventOrder.length-1 && dayArr[i]==dayArr[i+1] && monthArr[i]==monthArr[i+1])
+				while (i<eventOrder.length-1 && dayArray[i]==dayArray[i+1] && monthArray[i]==monthArray[i+1])
 				{
 					i++;
 					markup+=eventOrder[i];
@@ -529,6 +421,11 @@
   
 	function updateEvent()
    {
+		var obj=new Object();
+		obj.stupid="stupid";
+		obj.smart="smart";
+		alert(obj.stupid);
+	/*
    	  var context3;
 	  var list3;
 	  var caml3;
@@ -543,7 +440,7 @@
 		 returnedItems3 = list3.getItems(caml3);  
 		 context3.load(returnedItems3);  
 		 //Run the query asynchronously, passing the functions to call when a response arrives  
-		 context3.executeQueryAsync(eventCallback, onFailedCallback3);
+		 context3.executeQueryAsync(eventCallback, onFailedCallback3);*/
    }
 	   
 	function eventCallback(sender, args) 
@@ -581,10 +478,12 @@
 		queryListItems ();
 	}
 </script>
+<!-- Do we need "none" to be displayed or not display at all (ASK ANDREW)-->
 
 <!-- Format margin of the last row -->
 <!-- Add in end date for events with different start/end dates -->
 <!-- Drop down list based on events available, move all to load location? -->
+<!-- Fit all in one page-->
 <!-- Improve selection sort-->
 <!-- Notification for changes made (specific people) -->
 
