@@ -35,6 +35,9 @@
 	  
 	  //Array of speaker objects containing speaker information
 	  var speakerObjectList=[];
+	  
+	  var startDate;
+	  var endDate;
 		
 	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays///////////////////////////////////////////////////////////
 	function querySpeaker()
@@ -89,11 +92,13 @@
 			 counter++;//increment counter to move onto next contact
 		}
 	}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
       //This function loads the list and runs the query to produce the table
       function queryListItems() { 
-		var startDate=document.getElementById("startRange").value;
-		var endDate=document.getElementById("endRange").value;
+		startDate=new Date(document.getElementById("startRange").value);
+		endDate=new Date(document.getElementById("endRange").value);
+		startDate.setDate(startDate.getDate()+startDate.getTimezoneOffset()/60.0/24.0);//account for time zone difference
+		endDate.setDate(endDate.getDate()+endDate.getTimezoneOffset()/60.0/24.0+1);//account for time zone difference, 1 is to include an extra day at the end
 		
 		var yourSelect = document.getElementById( "listEvents" );	
 		//Check if user has selected an event to generate report
@@ -102,7 +107,7 @@
 		 {
 			alert('Please Select an Event');
 		 }
-		 else if(startDate>endDate)
+		 else if(!(startDate<=endDate))
 		 {
 			alert('Start date cannot be after end date');
 		 }
@@ -148,6 +153,9 @@
 			//gets the name of the event this session belongs to
 			
 			//Stores the day of week, day, and the month into separate arrays
+			var sessionFullDate=new Date(listItem.get_item('Start_x0020_DateTime'));
+			//full date of the session to check for range
+			
 			dayOfWeekArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
 			dayArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDate());
 			monthArray[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
@@ -162,7 +170,7 @@
 			timeEvent[order]=startHour;
 			timeEvent[order]+=startMinute*1.0/60;//hour with respect to midnight to help order events later
 				
-			 if (eventName==eventWant) //Execute code if session in event we want to query
+			 if ((eventName==eventWant)&&(sessionFullDate>=startDate)&&(sessionFullDate<=endDate)) //Execute code if session in event we want to query and in date range
 			 {				
 				//Changing the format from 24-hour to am/pm for start time
 				var ampmString=" a.m.";//string to attach am or pm to the end of time
