@@ -1,3 +1,9 @@
 table, th, td{border: 2px solid black;border-collapse: collapse;} 
 strong{font-size:120%;} 
+.time{font-size:120%;font-weight: bold;}
+.contactName{font-size:120%;font-weight: bold;}
+.sessionName{font-size:120%;font-weight: bold;}
+.firstColumn{width:30%;}
+.secondColumn{width:35%;}
+.thirdColumn{width:35%;}
 th{font-size:120%;}

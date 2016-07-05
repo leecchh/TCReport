@@ -29,22 +29,12 @@
 	  var eventOrder=[];
 	  var timeEvent=[];
 	  var monthArray=[];
+	  var yearArray=[];
 	  var dayArray=[];
 	  var dayOfWeekArray=[];
 	  
 	  //Array of speaker objects containing speaker information
 	  var speakerObjectList=[];
-	  
-	  //The following code runs as soon as the page is loaded
-	  $(window).load( function() {
-			//if (populateEvent()!="Failed")
-			//{
-				var selectHtml="";
-				selectHtml+="";
-				//updateEvent();
-				//document.getElementById("listEvents").innerHTML = "<option selected value='base'>Select Event</option>";
-			//}
-		});
 		
 	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays///////////////////////////////////////////////////////////
 	function querySpeaker()
@@ -102,6 +92,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //This function loads the list and runs the query to produce the table
       function queryListItems() { 
+		var startDate=document.getElementById("startRange").value;
+		var endDate=document.getElementById("endRange").value;
+		
 		var yourSelect = document.getElementById( "listEvents" );	
 		//Check if user has selected an event to generate report
 		eventWant=yourSelect.options[ yourSelect.selectedIndex ].value;
@@ -109,7 +102,11 @@
 		 {
 			alert('Please Select an Event');
 		 }
-		 //Continue if user has selected an option
+		 else if(startDate>endDate)
+		 {
+			alert('Start date cannot be after end date');
+		 }
+		 //Continue if user has selected an option and date range is valid
 		 else
 		 {
 			var context;
@@ -154,9 +151,11 @@
 			dayOfWeekArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
 			dayArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDate());
 			monthArray[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
+			yearArray[order]=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
 			
 			var startHour=((listItem.get_item('Start_x0020_DateTime')).getHours());
 			//startHour gets the hour of the start time
+
 			var startMinute=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
 			//startMinute get the minute of the start time
 			
@@ -166,7 +165,7 @@
 			 if (eventName==eventWant) //Execute code if session in event we want to query
 			 {				
 				//Changing the format from 24-hour to am/pm for start time
-				var ampmString=" a.m.";
+				var ampmString=" a.m.";//string to attach am or pm to the end of time
 				if (startHour>12)
 				{
 					startHour-=12;
@@ -244,10 +243,9 @@
 						//add a line break if not the first speaker
 						contactString+="<br>"
 					}
-					contactString+="<strong> Contact: "+tempStr+"</strong>";
+					contactString+="<div class='contactName'> Contact: "+tempStr+"</div>";
 					
 					//Get contact value and add to markup
-					//querySpeaker();
 					var speakerNum=-1;
 					for(var i=0;i<speakerObjectList.length;i++)
 					{
@@ -258,14 +256,36 @@
 							break;
 						}
 					}
-					//display all the data for a specific speaker
-					contactString+=" <br> "+speakerObjectList[speakerNum].Job+" <br> ";
-					contactString+="Address: "+speakerObjectList[speakerNum].Address+"<br>";
-					contactString+="City: "+speakerObjectList[speakerNum].City+"<br>";
-					contactString+="State: "+speakerObjectList[speakerNum].State+"<br>";
-					contactString+="Phone: "+speakerObjectList[speakerNum].Phone+"<br>";
-					contactString+="Fax: "+speakerObjectList[speakerNum].Fax+"<br>";
-					contactString+="Email: "+speakerObjectList[speakerNum].Email+"<br>";
+					//display all the data for a specific speaker if it's not null
+					
+					if (speakerObjectList[speakerNum].Job!=null)
+					{
+						contactString+=" <br> "+speakerObjectList[speakerNum].Job+" <br> ";
+					}
+					if (speakerObjectList[speakerNum].Address!=null)
+					{
+						contactString+="Address: "+speakerObjectList[speakerNum].Address+"<br>";
+					}
+					if (speakerObjectList[speakerNum].City!=null)
+					{
+						contactString+="City: "+speakerObjectList[speakerNum].City+"<br>";
+					}
+					if (speakerObjectList[speakerNum].State!=null)
+					{
+						contactString+="State: "+speakerObjectList[speakerNum].State+"<br>";
+					}
+					if (speakerObjectList[speakerNum].Phone!=null)
+					{
+						contactString+="Phone: "+speakerObjectList[speakerNum].Phone+"<br>";
+					}
+					if (speakerObjectList[speakerNum].Fax!=null)
+					{
+						contactString+="Fax: "+speakerObjectList[speakerNum].Fax+"<br>";
+					}
+					if (speakerObjectList[speakerNum].Email!=null)
+					{
+						contactString+="Email: "+speakerObjectList[speakerNum].Email+"<br>";
+					}				
 
 					//contactString+="Designations: "+speakerDesignation[speakerNum]+"<br>";
 					//contactString+="FR: "+speakerFR[speakerNum]+"<br>";
@@ -300,7 +320,7 @@
 					publishStr="<br> DO NOT PUBLISH";
 				}
 				
-				eventOrder[order]+="<td><strong>"+String(timeStart)+" - "+String(timeEnd)+" <br> </strong>"+listItem.get_item('Source')+publishStr+"</td>";
+				eventOrder[order]+="<td><div class='time'>"+String(timeStart)+" - "+String(timeEnd)+" <br> </div>"+listItem.get_item('Source')+publishStr+"</td>";
 				//Prints out the time, source, and whether it should be published
 				
 				var locationStr="";
@@ -309,7 +329,7 @@
 				{
 					locationStr="<br>"+listItem.get_item('Room_x0020_Location')+" - "+roomName;
 				}
-				eventOrder[order]+="<td><strong>"+listItem.get_item('Title')+"</strong>"+locationStr+" </td>";
+				eventOrder[order]+="<td><div class='sessionName'>"+listItem.get_item('Title')+"</div>"+locationStr+" </td>";
 				eventOrder[order]+="<td>"+contactString+"</td>";//shows information of the contact
 				eventOrder[order]+="</tr>";//Ends the row
 				//eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
@@ -317,12 +337,12 @@
 			 order++;//add one to the variable in order to organize the events based on start time
 		}	
 		
-		
 		//Selection sort O(n^2) in terms of start time, can be improved for large data sets
 		for(var a=0;a<timeEvent.length-1;a++)
 		{
 			for(var b=a+1;b<timeEvent.length;b++)
 			{
+				//compare the start time of two sessions, switch if necessary to sort list of sessions
 				if (timeEvent[a]+dayArray[a]*24+monthArray[a]*24*31>timeEvent[b]+dayArray[b]*24+monthArray[b]*24*31)
 				{
 					var temp=eventOrder[a];
@@ -385,8 +405,8 @@
 				else if (dayOfWeekArray[i]==6) {dowStr="Saturday";}
 				else if (dayOfWeekArray[i]==0) {dowStr="Sunday";}
 				
-				markup+="<table style='width:100%'><tr><th colspan='3'>"+dowStr+", "+monthStr+" "+dayStr+"</th></tr><tr><th>Time</th>"+
-			 "<th style='width:350px'>Session</th><th>Contacts</th></tr>";
+				markup+="<table style='width:100%'><tr><th colspan='3'>"+dowStr+", "+monthStr+" "+dayStr+"</th></tr><tr><th class='firstColumn'>Time</th>"+
+			 "<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr>";
 				
 				markup+=eventOrder[i];
 				while (i<eventOrder.length-1 && dayArray[i]==dayArray[i+1] && monthArray[i]==monthArray[i+1])
@@ -420,12 +440,7 @@
    }  
   
 	function updateEvent()
-   {
-		var obj=new Object();
-		obj.stupid="stupid";
-		obj.smart="smart";
-		alert(obj.stupid);
-	/*
+   {	
    	  var context3;
 	  var list3;
 	  var caml3;
@@ -440,62 +455,48 @@
 		 returnedItems3 = list3.getItems(caml3);  
 		 context3.load(returnedItems3);  
 		 //Run the query asynchronously, passing the functions to call when a response arrives  
-		 context3.executeQueryAsync(eventCallback, onFailedCallback3);*/
+		 context3.executeQueryAsync(eventCallback, onFailedCallback3);
    }
 	   
 	function eventCallback(sender, args) 
 	{ 
-
 		alert('success');
-	/*
-        //Get an enumerator for the items in the list  
-        enumerator = returnedItems.getEnumerator();  
-        //Loop through all the items
-        //while (enumerator.moveNext()) 
-		//{
-		//	listItem = enumerator.get_current();
-		//	eventList.push(listItem.get_item('Title'));			
-		//}
-			// get reference to select element
-			sel = document.getElementById('listEvents');
-
-			// create new option element
-			opt = document.createElement('option');
-		
-			// create text node to add to option element (opt)
-			opt.appendChild( document.createTextNode('New Option Textfdsafdsafdsafadsfafffffffffffffffffffffff') );
-
-			// set value property of opt
-			opt.value = 'option value';
-
-			// add opt to end of select box (sel)
-			sel.appendChild(opt);
-			alert('wow2');*/
 	}
-	function callFunction()
+	function generateReport()
 	{
 		querySpeaker ();
 		queryListItems ();
 	}
+	
+	//The following code runs as soon as the page is loaded
+	  $(window).load( function() {
+		var selectHtml="";
+		selectHtml+="";
+		//document.getElementById("listEvents").innerHTML = "<option selected value='base'>Select Event</option>";
+		});
+	
 </script>
-<!-- Do we need "none" to be displayed or not display at all (ASK ANDREW)-->
+<!-- Do we need to filter for year?-->
 
-<!-- Format margin of the last row -->
-<!-- Add in end date for events with different start/end dates -->
-<!-- Drop down list based on events available, move all to load location? -->
+<!-- Query for a date range of sessions (Compare input date with session date)-->
+<!-- change montharr etc into object as well -->
+<!-- Drop down list based on events available, move all to load location? (DEBUG THIS)-->
 <!-- Fit all in one page-->
 <!-- Improve selection sort-->
 <!-- Notification for changes made (specific people) -->
+<!-- Compatible for internet explorer -->
 
 <body>
 <select id="listEvents">
 	<option value='base'>Select Event</option>"
-   <option value="Annual Meeting">Annual Meeting</option>
+   <option value="Annual Meeting" selected>Annual Meeting</option>
   <option value="Event 1">Event 1</option> 
   <option value="Event 2">Event 2</option>
-</select>
+</select><br>
+Start Date Range: <input type="date" id="startRange" value="2000-01-01"><br>
+End Date Range: <input type="date" id="endRange" value="2100-01-01"><br>
 <div><button id="updateButton" onclick=" updateEvent()">Update Events</button></div>
 <br><br>
-<div><button id="queryButton" onclick=" callFunction()">Create Report</button></div><!--Button calls queryListItems() when clicked-->
+<div><button id="queryButton" onclick=" generateReport()">Create Report</button></div>
 </body>
 </html>
