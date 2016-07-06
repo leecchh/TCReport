@@ -27,17 +27,15 @@
 	  
 	  //variables for ordering events by time
 	  var eventOrder=[];
-	  var timeEvent=[];
-	  var monthArray=[];
 	  var yearArray=[];
-	  var dayArray=[];
-	  var dayOfWeekArray=[];
 	  
 	  //Array of speaker objects containing speaker information
 	  var speakerObjectList=[];
 	  
 	  var startDate;
 	  var endDate;
+	  var sessionFullDate=[];
+	  var currentDate;
 		
 	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays///////////////////////////////////////////////////////////
 	function querySpeaker()
@@ -141,8 +139,9 @@
          //Formulate HTML from the list items  
 		 //Writing the title and styling it
          markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>"+
-		 "<title>Report</title><h2><center>2016 Annual Meeting of the Association of Network"+
-		 " Representatives</center></h2>";  
+		 "<title>Report</title><center><h2>2016 Annual Meeting of the Association of Network"+
+		 " Representatives</h2><div id='location'><strong>Wisconsin Center</strong><br>400 West Wisconsin Avenue<br>Milwaukee, WI 53203<br>General Phone: 414-908-6001"+
+		 "</div><br></center>";  
          //Loop through all the items  
 		 var order=0;
         while (enumerator.moveNext()) //for each session possible
@@ -153,12 +152,9 @@
 			//gets the name of the event this session belongs to
 			
 			//Stores the day of week, day, and the month into separate arrays
-			var sessionFullDate=new Date(listItem.get_item('Start_x0020_DateTime'));
+			sessionFullDate[order]=new Date(listItem.get_item('Start_x0020_DateTime'));
 			//full date of the session to check for range
 			
-			dayOfWeekArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDay());
-			dayArray[order]=((listItem.get_item('Start_x0020_DateTime')).getDate());
-			monthArray[order]=((listItem.get_item('Start_x0020_DateTime')).getMonth()+1);
 			yearArray[order]=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
 			
 			var startHour=((listItem.get_item('Start_x0020_DateTime')).getHours());
@@ -166,11 +162,8 @@
 
 			var startMinute=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
 			//startMinute get the minute of the start time
-			
-			timeEvent[order]=startHour;
-			timeEvent[order]+=startMinute*1.0/60;//hour with respect to midnight to help order events later
 				
-			 if ((eventName==eventWant)&&(sessionFullDate>=startDate)&&(sessionFullDate<=endDate)) //Execute code if session in event we want to query and in date range
+			 if ((eventName==eventWant)&&(sessionFullDate[order]>=startDate)&&(sessionFullDate[order]<=endDate)) //Execute code if session in event we want to query and in date range
 			 {				
 				//Changing the format from 24-hour to am/pm for start time
 				var ampmString=" a.m.";//string to attach am or pm to the end of time
@@ -346,78 +339,62 @@
 		}	
 		
 		//Selection sort O(n^2) in terms of start time, can be improved for large data sets
-		for(var a=0;a<timeEvent.length-1;a++)
+		for(var a=0;a<sessionFullDate.length-1;a++)
 		{
-			for(var b=a+1;b<timeEvent.length;b++)
+			for(var b=a+1;b<sessionFullDate.length;b++)
 			{
 				//compare the start time of two sessions, switch if necessary to sort list of sessions
-				if (timeEvent[a]+dayArray[a]*24+monthArray[a]*24*31>timeEvent[b]+dayArray[b]*24+monthArray[b]*24*31)
+				if (sessionFullDate[a].getTime()>sessionFullDate[b].getTime())
 				{
 					var temp=eventOrder[a];
 					eventOrder[a]=eventOrder[b];
 					eventOrder[b]=temp;
 					//Flip the order html is made
 					
-					var temp2=timeEvent[a];
-					timeEvent[a]=timeEvent[b];
-					timeEvent[b]=temp2;
-					//Flip the hour and minute
-					
-					var temp3=dayArray[a];
-					dayArray[a]=dayArray[b];
-					dayArray[b]=temp3;
-					//Flip the day
-					
-					var temp4=monthArray[a];
-					monthArray[a]=monthArray[b];
-					monthArray[b]=temp4;
-					//Flip the month
-					
-					var temp5=dayOfWeekArray[a];
-					dayOfWeekArray[a]=dayOfWeekArray[b];
-					dayOfWeekArray[b]=temp5;
-					//Flip the day of week
+					var tempFullTime=sessionFullDate[a];
+					sessionFullDate[a]=sessionFullDate[b];
+					sessionFullDate[b]=tempFullTime;
+					//Flip the time of the session as well
 				}
 			}
 		}
 
-		//var currentDate=dayArray[a]+monthArray[a]*31;
 		//Add each html element in the sorted array into the document to be displayed
 		for(var i=0;i<eventOrder.length;i++)
 		{
 			if (eventOrder[i]!="")
 			{
-				var dayStr=dayArray[i];
+				var dayStr=sessionFullDate[i].getDate();
 				var monthStr;
 				var dowStr;
 				//Convert the number into a month string to be displayed
-				if (monthArray[i]==1) {monthStr="January";}
-				else if (monthArray[i]==2) {monthStr="February";}
-				else if (monthArray[i]==3) {monthStr="March";}
-				else if (monthArray[i]==4) {monthStr="April";}
-				else if (monthArray[i]==5) {monthStr="May";}
-				else if (monthArray[i]==6) {monthStr="June";}
-				else if (monthArray[i]==7) {monthStr="July";}
-				else if (monthArray[i]==8) {monthStr="August";}
-				else if (monthArray[i]==9) {monthStr="September";}
-				else if (monthArray[i]==10) {monthStr="October";}
-				else if (monthArray[i]==11) {monthStr="November";}
-				else if (monthArray[i]==12) {monthStr="December";}
+				if (sessionFullDate[i].getMonth()==0) {monthStr="JANUARY";}
+				else if (sessionFullDate[i].getMonth()==1) {monthStr="FEBRUARY";}
+				else if (sessionFullDate[i].getMonth()==2) {monthStr="MARCH";}
+				else if (sessionFullDate[i].getMonth()==3) {monthStr="APRIL";}
+				else if (sessionFullDate[i].getMonth()==4) {monthStr="MAY";}
+				else if (sessionFullDate[i].getMonth()==5) {monthStr="JUNE";}
+				else if (sessionFullDate[i].getMonth()==6) {monthStr="JULY";}
+				else if (sessionFullDate[i].getMonth()==7) {monthStr="AUGUST";}
+				else if (sessionFullDate[i].getMonth()==8) {monthStr="SEPTEMBER";}
+				else if (sessionFullDate[i].getMonth()==9) {monthStr="OCTOBER";}
+				else if (sessionFullDate[i].getMonth()==10) {monthStr="NOVEMBER";}
+				else if (sessionFullDate[i].getMonth()==11) {monthStr="DECEMBER";}
 				
 				//Convert the number into a day of week string to be displayed
-				if (dayOfWeekArray[i]==1) {dowStr="Monday";}
-				else if (dayOfWeekArray[i]==2) {dowStr="Tuesday";}
-				else if (dayOfWeekArray[i]==3) {dowStr="Wednesday";}
-				else if (dayOfWeekArray[i]==4) {dowStr="Thursday";}
-				else if (dayOfWeekArray[i]==5) {dowStr="Friday";}
-				else if (dayOfWeekArray[i]==6) {dowStr="Saturday";}
-				else if (dayOfWeekArray[i]==0) {dowStr="Sunday";}
+				if (sessionFullDate[i].getDay()==1) {dowStr="MONDAY";}
+				else if (sessionFullDate[i].getDay()==2) {dowStr="TUESDAY";}
+				else if (sessionFullDate[i].getDay()==3) {dowStr="WEDNESDAY";}
+				else if (sessionFullDate[i].getDay()==4) {dowStr="THURSDAY";}
+				else if (sessionFullDate[i].getDay()==5) {dowStr="FRIDAY";}
+				else if (sessionFullDate[i].getDay()==6) {dowStr="SATURDAY";}
+				else if (sessionFullDate[i].getDay()==0) {dowStr="SUNDAY";}
 				
-				markup+="<table style='width:100%'><tr><th colspan='3'>"+dowStr+", "+monthStr+" "+dayStr+"</th></tr><tr><th class='firstColumn'>Time</th>"+
+				markup+="<table style='width:100%'><tr><th colspan='3' class='date'>"+dowStr+", "+monthStr+" "+dayStr+"</th></tr><tr><th class='firstColumn'>Time</th>"+
 			 "<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr>";
 				
 				markup+=eventOrder[i];
-				while (i<eventOrder.length-1 && dayArray[i]==dayArray[i+1] && monthArray[i]==monthArray[i+1])
+				while (i<eventOrder.length-1 && sessionFullDate[i].getDate()==sessionFullDate[i+1].getDate() && sessionFullDate[i].getMonth()==sessionFullDate[i+1].getMonth())
 				{
 					i++;
 					markup+=eventOrder[i];
@@ -474,23 +451,44 @@
 	{
 		querySpeaker ();
 		queryListItems ();
-	}
+	}	 
 	
 	//The following code runs as soon as the page is loaded
-	  $(window).load( function() {
+	  $(document).ready( function() {
 		var selectHtml="";
 		selectHtml+="";
-		//document.getElementById("listEvents").innerHTML = "<option selected value='base'>Select Event</option>";
+		
+		//Get the current date, attach 0 in front of month and day as needed
+		currentDate=new Date(Date.now());
+		var monthString=currentDate.getMonth()+1;
+		if (monthString<10)
+		{
+			monthString="0"+monthString;
+		}
+		var dayString=currentDate.getDate();
+		if (dayString<10)
+		{
+			dayString="0"+dayString;
+		}
+		currentDate=currentDate.getFullYear()+"-"+monthString+"-"+dayString;
+		
+		//Update the startRange to the current date
+		document.getElementById("startRange").value = currentDate;
+		
+		//Slightly different display below if browser is not Chrome
+		if( navigator.userAgent.indexOf("Chrome") == -1 ) 
+		{
+			document.getElementById("startRange").value = "mm/dd/yyyy";
+			document.getElementById("endRange").value = "mm/dd/yyyy";
+		}
 		});
-	
 </script>
-<!-- Do we need to filter for year?-->
 
-<!-- Query for a date range of sessions (Compare input date with session date)-->
-<!-- change montharr etc into object as well -->
+<!-- and make compatible for IE-->
 <!-- Drop down list based on events available, move all to load location? (DEBUG THIS)-->
+<!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
 <!-- Fit all in one page-->
-<!-- Improve selection sort-->
+<!-- Improve selection sort (Change it to a merge sort, extra array)-->
 <!-- Notification for changes made (specific people) -->
 <!-- Compatible for internet explorer -->
 
@@ -501,9 +499,9 @@
   <option value="Event 1">Event 1</option> 
   <option value="Event 2">Event 2</option>
 </select><br>
-Start Date Range: <input type="date" id="startRange" value="2000-01-01"><br>
-End Date Range: <input type="date" id="endRange" value="2100-01-01"><br>
-<div><button id="updateButton" onclick=" updateEvent()">Update Events</button></div>
+Start Date Range: <input type="date" id="startRange" value="2016-01-01"><br><!-- Setting the default start date -->
+End Date Range: <input type="date" id="endRange" value="2020-01-01"><br><!-- Setting the default end date -->
+<div><button id="updateButton" onclick=" getBrowser()">Test Button</button></div>
 <br><br>
 <div><button id="queryButton" onclick=" generateReport()">Create Report</button></div>
 </body>

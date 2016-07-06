@@ -2,8 +2,10 @@ table, th, td{border: 2px solid black;border-collapse: collapse;}
 strong{font-size:120%;} 
 .time{font-size:120%;font-weight: bold;}
 .contactName{font-size:120%;font-weight: bold;}
-.sessionName{font-size:120%;font-weight: bold;}
+.sessionName{font-size:145%;font-weight: bold;}
 .firstColumn{width:30%;}
 .secondColumn{width:35%;}
-.thirdColumn{width:35%;}
-th{font-size:120%;}
+.thirdColumn{width:30%;}
+th{font-size:120%; background-color: #FFFF99;}
+.date{font-size:150%;background-color: #DCDCDC; colspan:'3';}
+#location{font-size:120%;}
