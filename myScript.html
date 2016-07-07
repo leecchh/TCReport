@@ -2,6 +2,7 @@
 <!--MAKE SURE POP UP IS NOT BLOCKED-->
 <!--USE CHROME BROWSER TO ENSURE NO ERRORS-->
 <!--IF CONTACT INFO SHOWS UP AS UNDEFINED, RERUN QUERY-->
+<!--BACKGROUND COLOR ENABLED WHEN PRINTING-->
 
 <html>
 <head>
@@ -22,6 +23,7 @@
 	  var markup;
 	  var listItem;
 	  var listItem2;
+	  var listItem3;
 	  var sel;
 	  var opt;
 	  
@@ -36,6 +38,7 @@
 	  var endDate;
 	  var sessionFullDate=[];
 	  var currentDate;
+	  var delay=false;
 		
 	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays///////////////////////////////////////////////////////////
 	function querySpeaker()
@@ -362,6 +365,7 @@
 		//Add each html element in the sorted array into the document to be displayed
 		for(var i=0;i<eventOrder.length;i++)
 		{
+			//If the eventOrder is not empty, the session is in the event we want so we add it to the html
 			if (eventOrder[i]!="")
 			{
 				var dayStr=sessionFullDate[i].getDate();
@@ -394,6 +398,7 @@
 			 "<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr>";
 				
 				markup+=eventOrder[i];
+				//While loop to link all sessions in same day to the same table
 				while (i<eventOrder.length-1 && sessionFullDate[i].getDate()==sessionFullDate[i+1].getDate() && sessionFullDate[i].getMonth()==sessionFullDate[i+1].getMonth())
 				{
 					i++;
@@ -445,13 +450,36 @@
 	   
 	function eventCallback(sender, args) 
 	{ 
-		alert('success');
+        var enumerator3 = returnedItems3.getEnumerator();  
+        while (enumerator3.moveNext()) //for each session possible
+		{  
+			listItem3 = enumerator3.get_current();
+			var option = document.createElement("option");
+			eventList.push(listItem3.get_item('Title'));
+			option.value     = listItem3.get_item('Title');
+			option.innerHTML = listItem3.get_item('Title');
+
+			var selectOption = document.getElementById("listEvents");
+			selectOption.appendChild(option);
+		}
 	}
+	
 	function generateReport()
 	{
 		querySpeaker ();
-		queryListItems ();
+		queryListItems();
 	}	 
+	
+	var delayFunction = function(){
+		if(delay){
+			delay=false;
+			updateEvent();// run when delay is done
+		}
+		else {
+			delay=true;
+			setTimeout(delayFunction, 250); // check again in a second
+		}
+	}
 	
 	//The following code runs as soon as the page is loaded
 	  $(document).ready( function() {
@@ -473,7 +501,8 @@
 		currentDate=currentDate.getFullYear()+"-"+monthString+"-"+dayString;
 		
 		//Update the startRange to the current date
-		document.getElementById("startRange").value = currentDate;
+		//document.getElementById("startRange").value = currentDate;
+		//UNCOMMENT when finished
 		
 		//Slightly different display below if browser is not Chrome
 		if( navigator.userAgent.indexOf("Chrome") == -1 ) 
@@ -481,27 +510,26 @@
 			document.getElementById("startRange").value = "mm/dd/yyyy";
 			document.getElementById("endRange").value = "mm/dd/yyyy";
 		}
+		
+		delayFunction();//Function that loads the dropdown list with events after slight delay
+		
 		});
 </script>
 
-<!-- and make compatible for IE-->
-<!-- Drop down list based on events available, move all to load location? (DEBUG THIS)-->
+<!-- Take out update event function-->
+<!-- Add in print CSS-->
+<!-- Year specifically in report?-->
 <!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
-<!-- Fit all in one page-->
 <!-- Improve selection sort (Change it to a merge sort, extra array)-->
 <!-- Notification for changes made (specific people) -->
-<!-- Compatible for internet explorer -->
 
 <body>
 <select id="listEvents">
 	<option value='base'>Select Event</option>"
-   <option value="Annual Meeting" selected>Annual Meeting</option>
-  <option value="Event 1">Event 1</option> 
-  <option value="Event 2">Event 2</option>
 </select><br>
 Start Date Range: <input type="date" id="startRange" value="2016-01-01"><br><!-- Setting the default start date -->
 End Date Range: <input type="date" id="endRange" value="2020-01-01"><br><!-- Setting the default end date -->
-<div><button id="updateButton" onclick=" getBrowser()">Test Button</button></div>
+<div><button id="updateButton" onclick=" updateEvent()">Update Event</button></div>
 <br><br>
 <div><button id="queryButton" onclick=" generateReport()">Create Report</button></div>
 </body>
