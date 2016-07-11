@@ -9,3 +9,11 @@ strong{font-size:120%;}
 th{font-size:120%; background-color: #FFFF99;}
 .date{font-size:150%;background-color: #DCDCDC; colspan:'3';}
 #location{font-size:120%;}
+
+@media print {
+  .tableBreak {page-break-before: always;}
+  .noBreak{
+        page-break-inside: avoid;
+    }
+
+}

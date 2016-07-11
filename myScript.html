@@ -2,7 +2,7 @@
 <!--MAKE SURE POP UP IS NOT BLOCKED-->
 <!--USE CHROME BROWSER TO ENSURE NO ERRORS-->
 <!--IF CONTACT INFO SHOWS UP AS UNDEFINED, RERUN QUERY-->
-<!--BACKGROUND COLOR ENABLED WHEN PRINTING-->
+<!--BACKGROUND GRAPHICS ENABLED WHEN PRINTING-->
 
 <html>
 <head>
@@ -11,86 +11,114 @@
 <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.2.min.js"><!--Uses jQuery Library hosted online-->
 </script>
    <script language="javascript" type="text/javascript">  
-      //This example gets all the items in the Events list, up to 1000 elements  
+    //This example gets all the items in the Events list, up to 1000 elements  
   
-      //This variable will hold a reference to the Events list items collection  
+	var DELAY=250;
+	var NOON=12;
+	var MINUTEINHOUR=60.0;
+	var HOURINDAY=24.0;
+		
+	//This variable will hold a reference to the Events list items collection  
+	var eventList=[];
+	var eventWant="";
+	var returnedItems = null;
+	var returnedItems2 = null;
+	var returnedItems3 = null;
+	var markup;
+	var listItem;
+	var listItem2;
+	var listItem3;
+	var sel;
+	var opt;
+
+	//variables for ordering events by time
+	var eventOrder=[];
+	var yearArray=[];
+
+	//Array of speaker objects containing speaker information
+	var speakerObjectList=[];
+
+	var startDate;
+	var endDate;
+	var sessionFullDate=[];
+	var currentDate;
+	var delay=false;
 	  
-	  var eventList=[];
-	  	var eventWant="";
-      var returnedItems = null;
-	  var returnedItems2 = null;
-	  var returnedItems3 = null;
-	  var markup;
-	  var listItem;
-	  var listItem2;
-	  var listItem3;
-	  var sel;
-	  var opt;
-	  
-	  //variables for ordering events by time
-	  var eventOrder=[];
-	  var yearArray=[];
-	  
-	  //Array of speaker objects containing speaker information
-	  var speakerObjectList=[];
-	  
-	  var startDate;
-	  var endDate;
-	  var sessionFullDate=[];
-	  var currentDate;
-	  var delay=false;
+	//Dictionaries of constants
+	var monthDictionary = {};
+	monthDictionary[0] = "JANUARY";
+	monthDictionary[1] = "FEBRUARY";
+	monthDictionary[2] = "MARCH";
+	monthDictionary[3] = "APRIL";
+	monthDictionary[4] = "MAY";
+	monthDictionary[5] = "JUNE";
+	monthDictionary[6] = "JULY";
+	monthDictionary[7] = "AUGUST";
+	monthDictionary[8] = "SEPTEMBER";
+	monthDictionary[9] = "OCTOBER";
+	monthDictionary[10] = "NOVEMBER";
+	monthDictionary[11] = "DECEMBER";
+	
+	var dayOfWeekDictionary={};
+	dayOfWeekDictionary[0]="SUNDAY";
+	dayOfWeekDictionary[1]="MONDAY";
+	dayOfWeekDictionary[2]="TUESDAY";
+	dayOfWeekDictionary[3]="WEDNESDAY";
+	dayOfWeekDictionary[4]="THURSDAY";
+	dayOfWeekDictionary[5]="FRIDAY";
+	dayOfWeekDictionary[6]="SATURDAY";
 		
 	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays///////////////////////////////////////////////////////////
 	function querySpeaker()
-   {
-   	  var context2;
-	  var list2;
-	  var caml2;
-		 //Get the current context  
-		 context2 = new SP.ClientContext();  
-		 //Get the Sessions list. Alter this code to match the name of your list  
-		 list2 = context2.get_web().get_lists().getByTitle('Contacts');  
-		 //Create a new CAML query
-		 caml2 = new SP.CamlQuery();  
-		 caml2.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
-		 //Specify the query and load the list oject  
-		 returnedItems2 = list2.getItems(caml2);  
-		 context2.load(returnedItems2);  
-		 //Run the query asynchronously, passing the functions to call when a response arrives  
-		 context2.executeQueryAsync(speakerCallback, onFailedCallback2);
-   }
-   
-   	function speakerCallback(sender, args) 
 	{
-		//Items returned from the query
-        var enumerator2 = returnedItems2.getEnumerator();  
-		//counter to keep track of which contact we're on
-		var counter=0;
+		var context2;
+		var list2;
+		var caml2;
+		//Get the current context  
+		context2 = new SP.ClientContext();  
+		//Get the Sessions list. Alter this code to match the name of your list  
+		list2 = context2.get_web().get_lists().getByTitle('Contacts');  
+		//Create a new CAML query
+		caml2 = new SP.CamlQuery();  
+		caml2.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
+		//Specify the query and load the list oject  
+		returnedItems2 = list2.getItems(caml2);  
+		context2.load(returnedItems2);  
+		//Run the query asynchronously, passing the functions to call when a response arrives  
+		context2.executeQueryAsync(speakerCallback, onFailedCallback);
+	}
+
+	function speakerCallback(sender, args) 
+	{
+	//Items returned from the query
+	var enumerator2 = returnedItems2.getEnumerator();  
+	//counter to keep track of which contact we're on
+	var counter=0;
 		while (enumerator2.moveNext()) 
 		{  
-			 listItem2 = enumerator2.get_current();
-			 //Store each type of data in an array for each contact, grouped by the type of data
-			 //For example speakerList[0] would be the name of the first contact, speakerList[1] is name of second contact
-			 
-			 var tempObj=new Object();
-			 tempObj.Name=listItem2.get_item('Title');
-			 tempObj.Job=listItem2.get_item('Job_x0020_Title');
-			 tempObj.Address=listItem2.get_item('Street_x0020_Address');
-			 tempObj.City=listItem2.get_item('City');
-			 tempObj.State=listItem2.get_item('State');
-			 tempObj.Phone=listItem2.get_item('Phone');
-			 tempObj.Fax=listItem2.get_item('Fax');
-			 tempObj.Email=listItem2.get_item('E_x002d_Mail_x0020_Address');
-			 tempObj.Designations=listItem2.get_item('Designations');
-			 tempObj.FR=listItem2.get_item('FR_x0020_Number');
-			 tempObj.NO=listItem2.get_item('NO_x0020_Number');
-			 tempObj.DNO=listItem2.get_item('DNO_x0020_Number');
-			 tempObj.Contact=listItem2.get_item('Contact_x0020_Type');
-			 tempObj.Agreement=listItem2.get_item('Speaker_x0020_agreement');
-			 tempObj.Compliance=listItem2.get_item('Speaker_x0020_Compliance');
-			 speakerObjectList.push(tempObj);
+			listItem2 = enumerator2.get_current();
+			//Store each type of data in an array for each contact, grouped by the type of data
+			//For example speakerList[0] would be the name of the first contact, speakerList[1] is name of second contact
 
-			 counter++;//increment counter to move onto next contact
+			var tempObj=new Object();
+			tempObj.Name=listItem2.get_item('Title');
+			tempObj.Job=listItem2.get_item('Job_x0020_Title');
+			tempObj.Address=listItem2.get_item('Street_x0020_Address');
+			tempObj.City=listItem2.get_item('City');
+			tempObj.State=listItem2.get_item('State');
+			tempObj.Phone=listItem2.get_item('Phone');
+			tempObj.Fax=listItem2.get_item('Fax');
+			tempObj.Email=listItem2.get_item('E_x002d_Mail_x0020_Address');
+			tempObj.Designations=listItem2.get_item('Designations');
+			tempObj.FR=listItem2.get_item('FR_x0020_Number');
+			tempObj.NO=listItem2.get_item('NO_x0020_Number');
+			tempObj.DNO=listItem2.get_item('DNO_x0020_Number');
+			tempObj.Contact=listItem2.get_item('Contact_x0020_Type');
+			tempObj.Agreement=listItem2.get_item('Speaker_x0020_agreement');
+			tempObj.Compliance=listItem2.get_item('Speaker_x0020_Compliance');
+			speakerObjectList.push(tempObj);
+
+			counter++;//increment counter to move onto next contact
 		}
 	}
 
@@ -98,8 +126,10 @@
       function queryListItems() { 
 		startDate=new Date(document.getElementById("startRange").value);
 		endDate=new Date(document.getElementById("endRange").value);
-		startDate.setDate(startDate.getDate()+startDate.getTimezoneOffset()/60.0/24.0);//account for time zone difference
-		endDate.setDate(endDate.getDate()+endDate.getTimezoneOffset()/60.0/24.0+1);//account for time zone difference, 1 is to include an extra day at the end
+		//account for time zone difference
+		startDate.setDate(startDate.getDate()+startDate.getTimezoneOffset()/MINUTEINHOUR/HOURINDAY);
+		//account for time zone difference, 1 is to include an extra day at the end
+		endDate.setDate(endDate.getDate()+(endDate.getTimezoneOffset()/MINUTEINHOUR/HOURINDAY)+1);
 		
 		var yourSelect = document.getElementById( "listEvents" );	
 		//Check if user has selected an event to generate report
@@ -169,20 +199,8 @@
 			 if ((eventName==eventWant)&&(sessionFullDate[order]>=startDate)&&(sessionFullDate[order]<=endDate)) //Execute code if session in event we want to query and in date range
 			 {				
 				//Changing the format from 24-hour to am/pm for start time
-				var ampmString=" a.m.";//string to attach am or pm to the end of time
-				if (startHour>12)
-				{
-					startHour-=12;
-					ampmString=" p.m.";
-				}
-				if (startHour==12)
-				{
-					ampmString=" p.m.";
-				}
-				if (startHour==0)
-				{
-					startHour+=12;
-				}
+				startHour=(ampmAttach(startHour))[0];
+				var ampmString=(ampmAttach(startHour))[1];
 				
 				if (startHour.toString().length==1) {startHour="0"+String(startHour);}
 				else {startHour=String(startHour);}
@@ -201,20 +219,8 @@
 				//endMinute gets the minute of the end time
 				
 				//Changing the format from 24-hour to am/pm for end time
-				var ampmString2=" a.m.";
-				if (endHour>12)
-				{
-					endHour-=12;
-					ampmString2=" p.m.";
-				}
-				if (endHour==12)
-				{
-					ampmString2=" p.m.";
-				}
-				if (endHour==0)
-				{
-					endHour+=12;
-				}
+				endHour=(ampmAttach(endHour))[0];
+				var ampmString2=(ampmAttach(endHour))[1];
 				
 				if (endHour.toString().length==1) {endHour="0"+String(endHour);}
 				else {endHour=String(endHour);}
@@ -260,42 +266,26 @@
 							break;
 						}
 					}
-					//display all the data for a specific speaker if it's not null
 					
-					if (speakerObjectList[speakerNum].Job!=null)
-					{
-						contactString+=" <br> "+speakerObjectList[speakerNum].Job+" <br> ";
-					}
-					if (speakerObjectList[speakerNum].Address!=null)
-					{
-						contactString+="Address: "+speakerObjectList[speakerNum].Address+"<br>";
-					}
-					if (speakerObjectList[speakerNum].City!=null)
-					{
-						contactString+="City: "+speakerObjectList[speakerNum].City+"<br>";
-					}
-					if (speakerObjectList[speakerNum].State!=null)
-					{
-						contactString+="State: "+speakerObjectList[speakerNum].State+"<br>";
-					}
-					if (speakerObjectList[speakerNum].Phone!=null)
-					{
-						contactString+="Phone: "+speakerObjectList[speakerNum].Phone+"<br>";
-					}
-					if (speakerObjectList[speakerNum].Fax!=null)
-					{
-						contactString+="Fax: "+speakerObjectList[speakerNum].Fax+"<br>";
-					}
-					if (speakerObjectList[speakerNum].Email!=null)
-					{
-						contactString+="Email: "+speakerObjectList[speakerNum].Email+"<br>";
-					}				
+					//display all the data for a specific speaker if it's not null
+					contactString+=displayNotNullData(" <br> ", speakerObjectList[speakerNum].Job);
+					contactString+=displayNotNullData("Contact Type: ", speakerObjectList[speakerNum].Contact);
+					contactString+=displayNotNullData("Address: ", speakerObjectList[speakerNum].Address);
+					contactString+=displayNotNullData("City: ", speakerObjectList[speakerNum].City);
+					contactString+=displayNotNullData("State: ", speakerObjectList[speakerNum].State);
+					contactString+=displayNotNullData("Phone: ", speakerObjectList[speakerNum].Phone);
+					contactString+=displayNotNullData("Fax: ", speakerObjectList[speakerNum].Fax);
+					contactString+=displayNotNullData("Email: ", speakerObjectList[speakerNum].Email);
 
 					//contactString+="Designations: "+speakerDesignation[speakerNum]+"<br>";
 					//contactString+="FR: "+speakerFR[speakerNum]+"<br>";
 					//contactString+="NO: "+speakerNO[speakerNum]+"<br>";
 					//contactString+="DNO: "+speakerDNO[speakerNum]+"<br>";
-					//contactString+="Contact Type: "+speakerContact[speakerNum]+"<br>";
+					//if (speakerContact[speakerNum]!=null)
+					//{
+					//	contactString+="Contact Type: "+speakerContact[speakerNum]+"<br>";
+					//}
+					
 					//contactString+="Agreement: "+speakerAgree[speakerNum]+"<br>";
 					//contactString+="Compliance: "+speakerCom[speakerNum]+"<br>";
 
@@ -315,7 +305,7 @@
 				
 				//add the variables to eventOrder
 				//Decides the order of the columns
-				eventOrder[order] += "<tr>";//Starts the row
+				eventOrder[order] += "<tbody class='noBreak'><tr>";//Starts the row
 							
 				var publishStr="";
 				//if field is false then write out DO NOT PUBLISH under session name
@@ -335,7 +325,7 @@
 				}
 				eventOrder[order]+="<td><div class='sessionName'>"+listItem.get_item('Title')+"</div>"+locationStr+" </td>";
 				eventOrder[order]+="<td>"+contactString+"</td>";//shows information of the contact
-				eventOrder[order]+="</tr>";//Ends the row
+				eventOrder[order]+="</tr></tbody>";//Ends the row
 				//eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
 			 }
 			 order++;//add one to the variable in order to organize the events based on start time
@@ -362,6 +352,7 @@
 			}
 		}
 
+		var firstPage=true;
 		//Add each html element in the sorted array into the document to be displayed
 		for(var i=0;i<eventOrder.length;i++)
 		{
@@ -369,33 +360,21 @@
 			if (eventOrder[i]!="")
 			{
 				var dayStr=sessionFullDate[i].getDate();
-				var monthStr;
-				var dowStr;
-				//Convert the number into a month string to be displayed
-				if (sessionFullDate[i].getMonth()==0) {monthStr="JANUARY";}
-				else if (sessionFullDate[i].getMonth()==1) {monthStr="FEBRUARY";}
-				else if (sessionFullDate[i].getMonth()==2) {monthStr="MARCH";}
-				else if (sessionFullDate[i].getMonth()==3) {monthStr="APRIL";}
-				else if (sessionFullDate[i].getMonth()==4) {monthStr="MAY";}
-				else if (sessionFullDate[i].getMonth()==5) {monthStr="JUNE";}
-				else if (sessionFullDate[i].getMonth()==6) {monthStr="JULY";}
-				else if (sessionFullDate[i].getMonth()==7) {monthStr="AUGUST";}
-				else if (sessionFullDate[i].getMonth()==8) {monthStr="SEPTEMBER";}
-				else if (sessionFullDate[i].getMonth()==9) {monthStr="OCTOBER";}
-				else if (sessionFullDate[i].getMonth()==10) {monthStr="NOVEMBER";}
-				else if (sessionFullDate[i].getMonth()==11) {monthStr="DECEMBER";}
+				//Gets the string for the month from the dictionary
+				var monthStr=monthDictionary[sessionFullDate[i].getMonth()];
+				//Gets the string for the day of week from the dictionary
+				var dayOfWeekString=dayOfWeekDictionary[sessionFullDate[i].getDay()];
 				
-				//Convert the number into a day of week string to be displayed
-				if (sessionFullDate[i].getDay()==1) {dowStr="MONDAY";}
-				else if (sessionFullDate[i].getDay()==2) {dowStr="TUESDAY";}
-				else if (sessionFullDate[i].getDay()==3) {dowStr="WEDNESDAY";}
-				else if (sessionFullDate[i].getDay()==4) {dowStr="THURSDAY";}
-				else if (sessionFullDate[i].getDay()==5) {dowStr="FRIDAY";}
-				else if (sessionFullDate[i].getDay()==6) {dowStr="SATURDAY";}
-				else if (sessionFullDate[i].getDay()==0) {dowStr="SUNDAY";}
-				
-				markup+="<table style='width:100%'><tr><th colspan='3' class='date'>"+dowStr+", "+monthStr+" "+dayStr+"</th></tr><tr><th class='firstColumn'>Time</th>"+
-			 "<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr>";
+				if(firstPage){
+					markup+="<table style='width:100%'><thead><tr><th colspan='3' class='date'>"+dayOfWeekString+", "+monthStr+" "+dayStr+"</th></tr></thead><tr><th class='firstColumn'>Time</th>"+
+					"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr>";
+				}
+				else{
+					markup+="<table style='width:100%' class='tableBreak'><tr><th colspan='3' class='date'>"+dayOfWeekString+", "+monthStr+" "+dayStr+"</th></tr><tr><th class='firstColumn'>Time</th>"+
+					"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr>";
+				}
+			 
+				firstPage=false;
 				
 				markup+=eventOrder[i];
 				//While loop to link all sessions in same day to the same table
@@ -413,21 +392,33 @@
 		newdocument=newwindow.document;
 		newdocument.write(markup);
 		newdocument.close();
+		alert("Report generated");
    }  
    
    //This function fires when the query fails  
    function onFailedCallback(sender, args) {  
       //Display the details  
 	  alert('Query failed');
-   }  
-    function onFailedCallback2(sender, args) {  
-      //Display the details  
-	  alert('Query failed');
-   }  
-   function onFailedCallback3(sender, args) {  
-      //Display the details  
-	  alert('Query failed');
-   }  
+	}
+  
+	function ampmAttach(Hour){
+		if (Hour>NOON)
+		{
+			return [Hour-NOON," p.m."];
+		}
+		else if (Hour==NOON)
+		{
+			return [Hour, " p.m."];
+		}
+		else if (Hour==0)
+		{
+			return [Hour+NOON, " a.m."];
+		}
+		else
+		{
+			return [Hour, " a.m."];
+		}
+	}
   
 	function updateEvent()
    {	
@@ -445,7 +436,7 @@
 		 returnedItems3 = list3.getItems(caml3);  
 		 context3.load(returnedItems3);  
 		 //Run the query asynchronously, passing the functions to call when a response arrives  
-		 context3.executeQueryAsync(eventCallback, onFailedCallback3);
+		 context3.executeQueryAsync(eventCallback, onFailedCallback);
    }
 	   
 	function eventCallback(sender, args) 
@@ -463,6 +454,17 @@
 			selectOption.appendChild(option);
 		}
 	}
+		
+	function displayNotNullData(preString, stringInput){
+		if (stringInput!=null)
+		{
+			return preString+stringInput+"<br>";
+		}
+		else
+		{
+			return "";
+		}
+	}
 	
 	function generateReport()
 	{
@@ -477,7 +479,7 @@
 		}
 		else {
 			delay=true;
-			setTimeout(delayFunction, 250); // check again in a second
+			setTimeout(delayFunction, DELAY); // check again in a second
 		}
 	}
 	
@@ -510,17 +512,25 @@
 			document.getElementById("startRange").value = "mm/dd/yyyy";
 			document.getElementById("endRange").value = "mm/dd/yyyy";
 		}
-		
-		delayFunction();//Function that loads the dropdown list with events after slight delay
+		updateEvent();
+		//delayFunction();//Function that loads the dropdown list with events after slight delay
+		//Try to remove timeout if possible
 		
 		});
 </script>
 
-<!-- Take out update event function-->
-<!-- Add in print CSS-->
-<!-- Year specifically in report?-->
+<!-- IE No Dates is All, Print two pages for long tables, page numbers on print, include header and footer-->
+<!-- change all strings to constants -->
+<!-- 1-2-3, scope out smaller functions in main function -->
+
+<!-- User Login for specific notes, userId, name  ctx.ctxId = 32; (540) (566) CTXNum="36"-->
+<!-- Take out alert "report generated" (Counter number of options tag?)-->
 <!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
 <!-- Improve selection sort (Change it to a merge sort, extra array)-->
+
+<!-- TODO: ASK ANDREW ABOUT SPECIFIC URL-->
+<!-- Data entry for specific meeting types -->
+<!-- Year specifically in report?-->
 <!-- Notification for changes made (specific people) -->
 
 <body>
