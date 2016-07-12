@@ -1,8 +1,6 @@
-<!--Tony Lee-->
+<!--Tony Lee, contact at chunglee2018@u.northwestern.edu-->
 <!--MAKE SURE POP UP IS NOT BLOCKED-->
-<!--USE CHROME BROWSER TO ENSURE NO ERRORS-->
-<!--IF CONTACT INFO SHOWS UP AS UNDEFINED, RERUN QUERY-->
-<!--BACKGROUND GRAPHICS ENABLED WHEN PRINTING-->
+<!--USE INTERNET EXPLORER BROWSER TO ENSURE NO ERRORS-->
 
 <html>
 <head>
@@ -13,7 +11,6 @@
    <script language="javascript" type="text/javascript">  
     //This example gets all the items in the Events list, up to 1000 elements  
   
-	var DELAY=250;
 	var NOON=12;
 	var MINUTEINHOUR=60.0;
 	var HOURINDAY=24.0;
@@ -68,7 +65,7 @@
 	dayOfWeekDictionary[5]="FRIDAY";
 	dayOfWeekDictionary[6]="SATURDAY";
 		
-	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays///////////////////////////////////////////////////////////
+	//Queryspeaker and speakerCallback stores all the speaker/contact details in arrays
 	function querySpeaker()
 	{
 		var context2;
@@ -122,61 +119,62 @@
 		}
 	}
 
-      //This function loads the list and runs the query to produce the table
-      function queryListItems() { 
+	//This function loads the list and runs the query to produce the table
+	function queryListItems() { 
 		startDate=new Date(document.getElementById("startRange").value);
 		endDate=new Date(document.getElementById("endRange").value);
 		//account for time zone difference
 		startDate.setDate(startDate.getDate()+startDate.getTimezoneOffset()/MINUTEINHOUR/HOURINDAY);
 		//account for time zone difference, 1 is to include an extra day at the end
 		endDate.setDate(endDate.getDate()+(endDate.getTimezoneOffset()/MINUTEINHOUR/HOURINDAY)+1);
-		
+
 		var yourSelect = document.getElementById( "listEvents" );	
 		//Check if user has selected an event to generate report
 		eventWant=yourSelect.options[ yourSelect.selectedIndex ].value;
-		 if ((eventWant=="base")==true)
-		 {
+		if ((eventWant=="base")==true)
+		{
 			alert('Please Select an Event');
-		 }
-		 else if(!(startDate<=endDate))
-		 {
-			alert('Start date cannot be after end date');
-		 }
-		 //Continue if user has selected an option and date range is valid
-		 else
-		 {
+		}
+		else if(!(startDate<=endDate))
+		{
+			alert('Invalid date range');
+		}
+		
+		//Continue if user has selected an option and date range is valid
+		else
+		{
 			var context;
 			var list;
 			var caml;
 
-			 //Get the current context  
-			 context = new SP.ClientContext();  
-			 //Get the Sessions list. Alter this code to match the name of your list  
-			 list = context.get_web().get_lists().getByTitle('Sessions');  
-			 //Create a new CAML query
-			 caml = new SP.CamlQuery();  
-			 caml.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
-			 //Specify the query and load the list oject  
-			 returnedItems = list.getItems(caml);  
-			 context.load(returnedItems);  
-			 //Run the query asynchronously, passing the functions to call when a response arrives  
-			 context.executeQueryAsync(onSucceededCallback, onFailedCallback);  
-		 }
-      }  
+			//Get the current context  
+			context = new SP.ClientContext();  
+			//Get the Sessions list. Alter this code to match the name of your list  
+			list = context.get_web().get_lists().getByTitle('Sessions');  
+			//Create a new CAML query
+			caml = new SP.CamlQuery();  
+			caml.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
+			//Specify the query and load the list oject  
+			returnedItems = list.getItems(caml);  
+			context.load(returnedItems);  
+			//Run the query asynchronously, passing the functions to call when a response arrives  
+			context.executeQueryAsync(onSucceededCallback, onFailedCallback);  
+		}
+	}  
   
       //This function fires when the query completes successfully  
-      function onSucceededCallback(sender, args) {  
+	function onSucceededCallback(sender, args) {  
          //Get an enumerator for the items in the list 
 		var enumerator;
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
 		 //Writing the title and styling it
          markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>"+
-		 "<title>Report</title><center><h2>2016 Annual Meeting of the Association of Network"+
+		 "<title>T&C Report</title><center><h2>2016 Annual Meeting of the Association of Network"+
 		 " Representatives</h2><div id='location'><strong>Wisconsin Center</strong><br>400 West Wisconsin Avenue<br>Milwaukee, WI 53203<br>General Phone: 414-908-6001"+
 		 "</div><br></center>";  
          //Loop through all the items  
-		 var order=0;
+		var order=0;
         while (enumerator.moveNext()) //for each session possible
 		{  
 			eventOrder[order]="";//initialize string to be apended
@@ -305,7 +303,7 @@
 				
 				//add the variables to eventOrder
 				//Decides the order of the columns
-				eventOrder[order] += "<tbody class='noBreak'><tr>";//Starts the row
+				eventOrder[order] += "<tr>";//Starts the row
 							
 				var publishStr="";
 				//if field is false then write out DO NOT PUBLISH under session name
@@ -325,7 +323,7 @@
 				}
 				eventOrder[order]+="<td><div class='sessionName'>"+listItem.get_item('Title')+"</div>"+locationStr+" </td>";
 				eventOrder[order]+="<td>"+contactString+"</td>";//shows information of the contact
-				eventOrder[order]+="</tr></tbody>";//Ends the row
+				eventOrder[order]+="</tr>";//Ends the row
 				//eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
 			 }
 			 order++;//add one to the variable in order to organize the events based on start time
@@ -392,7 +390,6 @@
 		newdocument=newwindow.document;
 		newdocument.write(markup);
 		newdocument.close();
-		alert("Report generated");
    }  
    
    //This function fires when the query fails  
@@ -472,17 +469,6 @@
 		queryListItems();
 	}	 
 	
-	var delayFunction = function(){
-		if(delay){
-			delay=false;
-			updateEvent();// run when delay is done
-		}
-		else {
-			delay=true;
-			setTimeout(delayFunction, DELAY); // check again in a second
-		}
-	}
-	
 	//The following code runs as soon as the page is loaded
 	  $(document).ready( function() {
 		var selectHtml="";
@@ -507,19 +493,16 @@
 		//UNCOMMENT when finished
 		
 		//Slightly different display below if browser is not Chrome
-		if( navigator.userAgent.indexOf("Chrome") == -1 ) 
+		/*if( navigator.userAgent.indexOf("Chrome") == -1 ) 
 		{
-			document.getElementById("startRange").value = "mm/dd/yyyy";
-			document.getElementById("endRange").value = "mm/dd/yyyy";
-		}
+			document.getElementById("startRange").value = "01/01/2016";
+			document.getElementById("endRange").value = "01/01/2020";
+		}*/
 		updateEvent();
-		//delayFunction();//Function that loads the dropdown list with events after slight delay
-		//Try to remove timeout if possible
 		
 		});
 </script>
 
-<!-- IE No Dates is All, Print two pages for long tables, page numbers on print, include header and footer-->
 <!-- change all strings to constants -->
 <!-- 1-2-3, scope out smaller functions in main function -->
 
@@ -538,7 +521,7 @@
 	<option value='base'>Select Event</option>"
 </select><br>
 Start Date Range: <input type="date" id="startRange" value="2016-01-01"><br><!-- Setting the default start date -->
-End Date Range: <input type="date" id="endRange" value="2020-01-01"><br><!-- Setting the default end date -->
+End Date Range: <input type="date" id="endRange" value="2020-12-31"><br><!-- Setting the default end date -->
 <div><button id="updateButton" onclick=" updateEvent()">Update Event</button></div>
 <br><br>
 <div><button id="queryButton" onclick=" generateReport()">Create Report</button></div>

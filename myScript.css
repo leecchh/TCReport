@@ -12,8 +12,6 @@ th{font-size:120%; background-color: #FFFF99;}
 
 @media print {
   .tableBreak {page-break-before: always;}
-  .noBreak{
-        page-break-inside: avoid;
-    }
+  tr{page-break-inside: avoid;}
 
 }
