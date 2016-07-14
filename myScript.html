@@ -94,8 +94,7 @@
 		while (enumerator2.moveNext()) 
 		{  
 			listItem2 = enumerator2.get_current();
-			//Store each type of data in an array for each contact, grouped by the type of data
-			//For example speakerList[0] would be the name of the first contact, speakerList[1] is name of second contact
+			//Store each type of data in an object for each contact, each field is part of the contact
 
 			var tempObj=new Object();
 			tempObj.Name=listItem2.get_item('Title');
@@ -188,17 +187,18 @@
 			
 			yearArray[order]=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
 			
-			var startHour=((listItem.get_item('Start_x0020_DateTime')).getHours());
 			//startHour gets the hour of the start time
+			var startHour=((listItem.get_item('Start_x0020_DateTime')).getHours());
 
-			var startMinute=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
 			//startMinute get the minute of the start time
+			var startMinute=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
 				
-			 if ((eventName==eventWant)&&(sessionFullDate[order]>=startDate)&&(sessionFullDate[order]<=endDate)) //Execute code if session in event we want to query and in date range
-			 {				
+			//Execute code if session in event we want to query and in date range
+			if ((eventName==eventWant)&&(sessionFullDate[order]>=startDate)&&(sessionFullDate[order]<=endDate))
+			{				
 				//Changing the format from 24-hour to am/pm for start time
-				startHour=(ampmAttach(startHour))[0];
 				var ampmString=(ampmAttach(startHour))[1];
+				startHour=(ampmAttach(startHour))[0];
 				
 				if (startHour.toString().length==1) {startHour="0"+String(startHour);}
 				else {startHour=String(startHour);}
@@ -217,8 +217,8 @@
 				//endMinute gets the minute of the end time
 				
 				//Changing the format from 24-hour to am/pm for end time
-				endHour=(ampmAttach(endHour))[0];
 				var ampmString2=(ampmAttach(endHour))[1];
+				endHour=(ampmAttach(endHour))[0];
 				
 				if (endHour.toString().length==1) {endHour="0"+String(endHour);}
 				else {endHour=String(endHour);}
@@ -240,6 +240,12 @@
 				//gets the room location
 				var roomLocation=listItem.get_item('Room_x0020_Location');
 				
+				//Gets the synopses
+				var synopses=listItem.get_item('Synopses');
+
+				//Get the AV Needs for a session
+				var avNeeds=listItem.get_item('AV_x0020_Needs');
+				
 				var count=0;
 				var contactString="";//string of contacts to be displayed
 				while(listItem.get_item('Speakers')[count]!=undefined)//iterate through each contact
@@ -251,7 +257,7 @@
 						//add a line break if not the first speaker
 						contactString+="<br>"
 					}
-					contactString+="<div class='contactName'> Contact: "+tempStr+"</div>";
+					contactString+="<span class='contactName'> Contact: "+tempStr+"</span><br>";
 					
 					//Get contact value and add to markup
 					var speakerNum=-1;
@@ -266,14 +272,14 @@
 					}
 					
 					//display all the data for a specific speaker if it's not null
-					contactString+=displayNotNullData(" <br> ", speakerObjectList[speakerNum].Job);
-					contactString+=displayNotNullData("Contact Type: ", speakerObjectList[speakerNum].Contact);
-					contactString+=displayNotNullData("Address: ", speakerObjectList[speakerNum].Address);
-					contactString+=displayNotNullData("City: ", speakerObjectList[speakerNum].City);
-					contactString+=displayNotNullData("State: ", speakerObjectList[speakerNum].State);
-					contactString+=displayNotNullData("Phone: ", speakerObjectList[speakerNum].Phone);
-					contactString+=displayNotNullData("Fax: ", speakerObjectList[speakerNum].Fax);
-					contactString+=displayNotNullData("Email: ", speakerObjectList[speakerNum].Email);
+					contactString+=displayNotNullData("", speakerObjectList[speakerNum].Job);
+					contactString+=displayNotNullData("Type: ", speakerObjectList[speakerNum].Contact);
+					//contactString+=displayNotNullData("Address: ", speakerObjectList[speakerNum].Address);
+					//contactString+=displayNotNullData("City: ", speakerObjectList[speakerNum].City);
+					//contactString+=displayNotNullData("State: ", speakerObjectList[speakerNum].State);
+					contactString+=displayNotNullData("", speakerObjectList[speakerNum].Phone);
+					//contactString+=displayNotNullData("Fax: ", speakerObjectList[speakerNum].Fax);
+					contactString+=displayNotNullData("", speakerObjectList[speakerNum].Email);
 
 					//contactString+="Designations: "+speakerDesignation[speakerNum]+"<br>";
 					//contactString+="FR: "+speakerFR[speakerNum]+"<br>";
@@ -312,16 +318,38 @@
 					publishStr="<br> DO NOT PUBLISH";
 				}
 				
-				eventOrder[order]+="<td><div class='time'>"+String(timeStart)+" - "+String(timeEnd)+" <br> </div>"+listItem.get_item('Source')+publishStr+"</td>";
+				var confirmString="";
+				if (listItem.get_item('Confirmed'))
+				{
+					confirmString="<br> <span class='confirmStyle'>CONFIRMED</span>";
+				}
+				
+				eventOrder[order]+="<td><div class='time'>"+String(timeStart)+" - "+String(timeEnd)+" <br> </div>"+listItem.get_item('Source')+confirmString+publishStr+"</td>";
 				//Prints out the time, source, and whether it should be published
 				
 				var locationStr="";
-				
 				if (roomLocation!=null)//if location is not null then set the location
 				{
 					locationStr="<br>"+listItem.get_item('Room_x0020_Location')+" - "+roomName;
 				}
-				eventOrder[order]+="<td><div class='sessionName'>"+listItem.get_item('Title')+"</div>"+locationStr+" </td>";
+				
+				//Gets the audience of the session
+				var audienceString="";
+				var audienceData=listItem.get_item('Audience');
+				if(audienceData!=null)
+				{
+					audienceString="<br>"+audienceData;
+				}
+				
+				//Gets the cost of the session
+				var costString="";
+				var sessionCost=listItem.get_item('Cost');
+				if(sessionCost!=null)
+				{
+					costString="<br>$"+sessionCost;
+				}
+				
+				eventOrder[order]+="<td><span class='sessionName'>"+listItem.get_item('Title')+"</span>"+costString+locationStr+audienceString+" </td>";
 				eventOrder[order]+="<td>"+contactString+"</td>";//shows information of the contact
 				eventOrder[order]+="</tr>";//Ends the row
 				//eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
@@ -337,15 +365,15 @@
 				//compare the start time of two sessions, switch if necessary to sort list of sessions
 				if (sessionFullDate[a].getTime()>sessionFullDate[b].getTime())
 				{
+					//Flip the order html is made
 					var temp=eventOrder[a];
 					eventOrder[a]=eventOrder[b];
 					eventOrder[b]=temp;
-					//Flip the order html is made
 					
+					//Flip the time of the session as well
 					var tempFullTime=sessionFullDate[a];
 					sessionFullDate[a]=sessionFullDate[b];
 					sessionFullDate[b]=tempFullTime;
-					//Flip the time of the session as well
 				}
 			}
 		}
@@ -490,7 +518,7 @@
 		
 		//Update the startRange to the current date
 		//document.getElementById("startRange").value = currentDate;
-		//UNCOMMENT when finished
+		//UNCOMMENT when finished if needed
 		
 		//Slightly different display below if browser is not Chrome
 		/*if( navigator.userAgent.indexOf("Chrome") == -1 ) 
@@ -499,21 +527,19 @@
 			document.getElementById("endRange").value = "01/01/2020";
 		}*/
 		updateEvent();
-		
 		});
 </script>
 
-<!-- change all strings to constants -->
+<!-- Synopses listItem.get_item('Synopses'), AV Needs listItem.get_item('AV_x0020_Needs') -->
+<!-- Same heading every page -->
+<!-- Fix event loading bug -->
 <!-- 1-2-3, scope out smaller functions in main function -->
+<!-- change all strings to constants -->
 
 <!-- User Login for specific notes, userId, name  ctx.ctxId = 32; (540) (566) CTXNum="36"-->
-<!-- Take out alert "report generated" (Counter number of options tag?)-->
 <!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
 <!-- Improve selection sort (Change it to a merge sort, extra array)-->
 
-<!-- TODO: ASK ANDREW ABOUT SPECIFIC URL-->
-<!-- Data entry for specific meeting types -->
-<!-- Year specifically in report?-->
 <!-- Notification for changes made (specific people) -->
 
 <body>
