@@ -198,8 +198,8 @@
 			if ((eventName==eventWant)&&(sessionFullDate[order]>=startDate)&&(sessionFullDate[order]<=endDate))
 			{				
 				//Changing the format from 24-hour to am/pm for start time
-				var ampmString=(ampmAttach(startHour))[1];
-				startHour=(ampmAttach(startHour))[0];
+				var ampmString=(ampmAttach(startHour)).ampmString;
+				startHour=(ampmAttach(startHour)).hour;
 				
 				if (startHour.toString().length==1) {startHour="0"+String(startHour);}
 				else {startHour=String(startHour);}
@@ -218,8 +218,8 @@
 				//endMinute gets the minute of the end time
 				
 				//Changing the format from 24-hour to am/pm for end time
-				var ampmString2=(ampmAttach(endHour))[1];
-				endHour=(ampmAttach(endHour))[0];
+				var ampmString2=(ampmAttach(endHour)).ampmString;
+				endHour=(ampmAttach(endHour)).hour;
 				
 				if (endHour.toString().length==1) {endHour="0"+String(endHour);}
 				else {endHour=String(endHour);}
@@ -258,11 +258,7 @@
 					var tempStr=(tempContact).get_lookupValue();//get the name of a speaker
 					tempContactString="";
 					//count is the number order of the speaker for a specific session
-					if (true)
-					{
-						//add a line break if not the first speaker
-						tempContactString+="<br>"
-					}
+						
 					tempContactString+="<span class='contactName'>"+tempStr+"</span><br>";
 					
 					//Get contact value and add to markup
@@ -280,7 +276,7 @@
 					//display all the data for a specific speaker if it's not null
 					tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Job);
 					tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Phone);
-					tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Email);		
+					tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Email);	
 					
 					//Check what type of contact this is and add to the specific string
 					switch(speakerObjectList[speakerNum].Contact) {
@@ -320,27 +316,61 @@
 					count++; //Increment count until there are no more contacts
 				}
 				
+				//First contact type to show up, so there is no space before that type
+				var firstContactType=true;
 				//The following decides the order of the type of contact that will show up
 				if (speakerString!="")
 				{
-					contactString+="<span class='contactType'>Speakers:</span>";
+					if (!firstContactType)
+					{
+						contactString+="<br>";
+					}
+					else
+					{
+						firstContactType=false;
+					}
+					contactString+="<span class='contactType'>Speakers:</span><br>";
+					contactString+=speakerString;
 				}
-				contactString+=speakerString;
 				if (hostString!="")
 				{
-					contactString+="<span class='contactType'>Hosts:</span>";
+					if (!firstContactType)
+					{
+						contactString+="<br>";
+					}
+					else
+					{
+						firstContactType=false;
+					}
+					contactString+="<span class='contactType'>Hosts:</span><br>";
+					contactString+=hostString;
 				}
-				contactString+=hostString;
 				if (generalString!="")
 				{
-					contactString+="<span class='contactType'>General:</span>";
+					if (!firstContactType)
+					{
+						contactString+="<br>";
+					}
+					else
+					{
+						firstContactType=false;
+					}
+					contactString+="<span class='contactType'>General:</span><br>";
+					contactString+=generalString;
 				}
-				contactString+=generalString;
 				if (chairpersonString!="")
 				{
-					contactString+="<span class='contactType'>Chairperson:</span>";
+					if (!firstContactType)
+					{
+						contactString+="<br>";
+					}
+					else
+					{
+						firstContactType=false;
+					}
+					contactString+="<span class='contactType'>Chairperson:</span><br>";
+					contactString+=chairpersonString;
 				}
-				contactString+=chairpersonString;
 				
 				//Whether this is a group session
 				var check="";
@@ -490,22 +520,28 @@
 	}
   
 	function ampmAttach(Hour){
+		var tempObject=new Object();
 		if (Hour>NOON)
 		{
-			return [Hour-NOON," p.m."];
+			tempObject.hour=Hour-NOON;
+			tempObject.ampmString=" p.m.";
 		}
 		else if (Hour==NOON)
 		{
-			return [Hour, " p.m."];
+			tempObject.hour=Hour;
+			tempObject.ampmString=" p.m.";
 		}
 		else if (Hour==0)
 		{
-			return [Hour+NOON, " a.m."];
+			tempObject.hour=Hour+NOON;
+			tempObject.ampmString=" a.m.";
 		}
 		else
 		{
-			return [Hour, " a.m."];
+			tempObject.hour=Hour;
+			tempObject.ampmString=" a.m.";
 		}
+		return tempObject;
 	}
   
 	function updateEvent()
@@ -593,12 +629,12 @@
 		});
 </script>
 
+<!-- External JS file, smaller functions-->
+<!-- Make some string variables-->
+<!-- Display venue data on top, expand if brackets-->
 <!-- Fix event loading bug -->
 <!-- Add OK after speaker if they agree -->
-<!-- Add other types of contacts to Sharepoint -->
-
-<!-- 1-2-3, scope out smaller functions in main function -->
-<!-- change all strings to constants -->
+<!-- Add other types of contacts to Sharepoint? Such as CEO or beneficiary? -->
 
 <!-- User Login for specific notes, userId, name  ctx.ctxId = 32; (540) (566) CTXNum="36"-->
 <!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
