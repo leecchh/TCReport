@@ -9,7 +9,7 @@ strong{font-size:120%;}
 th{font-size:120%; background-color: #FFFF99;}
 .date{font-size:150%;background-color: #DCDCDC; colspan:'3';}
 #location{font-size:120%;}
-.confirmStyle{color: blue;}
+.confirmStyle{color: red;}
 .contactType{font-size:130%; font-weight: bold;}
 
 @media print {
