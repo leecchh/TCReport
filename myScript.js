@@ -1,11 +1,9 @@
-<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.2.min.js">
-</script>
-<script language="javascript" type="text/javascript">  
 //This example gets all the items in the Events list, up to 1000 elements  
 
 var NOON=12;
 var MINUTEINHOUR=60.0;
 var HOURINDAY=24.0;
+var DELAY=200;
 	
 //This variable will hold a reference to the Events list items collection  
 var eventList=[];
@@ -19,19 +17,19 @@ var listItem2;
 var listItem3;
 var sel;
 var opt;
-
 //variables for ordering events by time
 var eventOrder=[];
 var yearArray=[];
-
 //Array of speaker objects containing speaker information
 var speakerObjectList=[];
-
 var startDate;
 var endDate;
 var sessionFullDate=[];
 var currentDate;
 var delay=false;
+//Array of venue objects containing venue information
+var venueObjectList=[];
+var EventObjectList=[];
   
 //Dictionaries of constants
 var monthDictionary = {};
@@ -56,6 +54,32 @@ dayOfWeekDictionary[3]="WEDNESDAY";
 dayOfWeekDictionary[4]="THURSDAY";
 dayOfWeekDictionary[5]="FRIDAY";
 dayOfWeekDictionary[6]="SATURDAY";
+
+//Strings for speaker attributes and venue attributes
+var titleString='Title';
+var jobString='Job_x0020_Title';
+var streetString='Street_x0020_Address';
+var cityString='City';
+var stateString='State';
+var phoneString='Phone';
+var faxString='Fax';
+var emailString='E_x002d_Mail_x0020_Address';
+var designationString='Designations';
+var FRNumberString='FR_x0020_Number';
+var NONumberString='NO_x0020_Number';
+var DNONumberString='DNO_x0020_Number';
+var contactString='Contact_x0020_Type';
+var speakerAgreeString='Speaker_x0020_agreement';
+var speakerComplianceString='Speaker_x0020_Compliance';
+var zipString='Zip_x0020_Code';
+var reservationString='Reservation_x0020_Phone';
+var venueLocationString='Venue_x0020_Location';
+
+var startTimeString='Start_x0020_DateTime';
+var endTimeString='End_x0020_DateTime';
+				
+//First contact type to show up, so there is no space before that type
+var firstContactType=true;
 	
 //Queryspeaker and speakerCallback stores all the speaker/contact details in arrays
 function querySpeaker()
@@ -76,37 +100,68 @@ function querySpeaker()
 	//Run the query asynchronously, passing the functions to call when a response arrives  
 	context2.executeQueryAsync(speakerCallback, onFailedCallback);
 }
-
 function speakerCallback(sender, args) 
 {
 //Items returned from the query
 var enumerator2 = returnedItems2.getEnumerator();  
-//counter to keep track of which contact we're on
-var counter=0;
 	while (enumerator2.moveNext()) 
 	{  
 		listItem2 = enumerator2.get_current();
-		//Store each type of data in an object for each contact, each field is part of the contact
-
+		//Store each type of data in an object for each contact, each field is part of the contact			
 		var tempObj=new Object();
-		tempObj.Name=listItem2.get_item('Title');
-		tempObj.Job=listItem2.get_item('Job_x0020_Title');
-		tempObj.Address=listItem2.get_item('Street_x0020_Address');
-		tempObj.City=listItem2.get_item('City');
-		tempObj.State=listItem2.get_item('State');
-		tempObj.Phone=listItem2.get_item('Phone');
-		tempObj.Fax=listItem2.get_item('Fax');
-		tempObj.Email=listItem2.get_item('E_x002d_Mail_x0020_Address');
-		tempObj.Designations=listItem2.get_item('Designations');
-		tempObj.FR=listItem2.get_item('FR_x0020_Number');
-		tempObj.NO=listItem2.get_item('NO_x0020_Number');
-		tempObj.DNO=listItem2.get_item('DNO_x0020_Number');
-		tempObj.Contact=listItem2.get_item('Contact_x0020_Type');
-		tempObj.Agreement=listItem2.get_item('Speaker_x0020_agreement');
-		tempObj.Compliance=listItem2.get_item('Speaker_x0020_Compliance');
+		tempObj.Name=listItem2.get_item(titleString);
+		tempObj.Job=listItem2.get_item(jobString);
+		tempObj.Address=listItem2.get_item(streetString);
+		tempObj.City=listItem2.get_item(cityString);
+		tempObj.State=listItem2.get_item(stateString);
+		tempObj.Phone=listItem2.get_item(phoneString);
+		tempObj.Fax=listItem2.get_item(faxString);
+		tempObj.Email=listItem2.get_item(emailString);
+		tempObj.Designations=listItem2.get_item(designationString);
+		tempObj.FR=listItem2.get_item(FRNumberString);
+		tempObj.NO=listItem2.get_item(NONumberString);
+		tempObj.DNO=listItem2.get_item(DNONumberString);
+		tempObj.Contact=listItem2.get_item(contactString);
+		tempObj.Agreement=listItem2.get_item(speakerAgreeString);
+		tempObj.Compliance=listItem2.get_item(speakerComplianceString);
 		speakerObjectList.push(tempObj);
+	}
+}
 
-		counter++;//increment counter to move onto next contact
+function queryVenue()
+{
+	var context4;
+	var list4;
+	var caml4;
+	//Get the current context  
+	context4 = new SP.ClientContext();  
+	//Get the Sessions list. Alter this code to match the name of your list  
+	list4 = context4.get_web().get_lists().getByTitle('Venues');  
+	//Create a new CAML query
+	caml4 = new SP.CamlQuery();  
+	caml4.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
+	//Specify the query and load the list oject  
+	returnedItems4 = list4.getItems(caml4);  
+	context4.load(returnedItems4);  
+	//Run the query asynchronously, passing the functions to call when a response arrives  
+	context4.executeQueryAsync(venueCallback, onFailedCallback);
+}
+function venueCallback(sender, args) 
+{
+//Items returned from the query
+var enumerator4 = returnedItems4.getEnumerator();  
+	while (enumerator4.moveNext()) 
+	{  
+		listItem4 = enumerator4.get_current();
+		//Store each type of data in an object for each venue, each field is part of the contact	
+		var tempObj=new Object();
+		tempObj.Name=listItem4.get_item(titleString);
+		tempObj.Address=listItem4.get_item(streetString);
+		tempObj.City=listItem4.get_item(cityString);
+		tempObj.State=listItem4.get_item(stateString);
+		tempObj.Zip=listItem4.get_item(zipString);
+		tempObj.Phone=listItem4.get_item(reservationString);
+		venueObjectList.push(tempObj);
 	}
 }
 
@@ -118,7 +173,6 @@ function queryListItems() {
 	startDate.setDate(startDate.getDate()+startDate.getTimezoneOffset()/MINUTEINHOUR/HOURINDAY);
 	//account for time zone difference, 1 is to include an extra day at the end
 	endDate.setDate(endDate.getDate()+(endDate.getTimezoneOffset()/MINUTEINHOUR/HOURINDAY)+1);
-
 	var yourSelect = document.getElementById( "listEvents" );	
 	//Check if user has selected an event to generate report
 	eventWant=yourSelect.options[ yourSelect.selectedIndex ].value;
@@ -137,7 +191,6 @@ function queryListItems() {
 		var context;
 		var list;
 		var caml;
-
 		//Get the current context  
 		context = new SP.ClientContext();  
 		//Get the Sessions list. Alter this code to match the name of your list  
@@ -160,9 +213,46 @@ function onSucceededCallback(sender, args) {
 	 enumerator = returnedItems.getEnumerator();  
 	 //Formulate HTML from the list items  
 	 //Writing the title and styling it
+	 
+	 var eventPosition=-1;
+	 for (var i=0;i<EventObjectList.length;i++) 
+	 {
+		//If the event in position i is the event we want
+		if (EventObjectList[i].Name==eventWant)
+		{
+			//Store the event position
+			eventPosition=i;
+			break;
+		}
+	 }
+	 
+	var venueString="";
+	 var count=0;
+	 //Only print out the venues that are tied to the event
+	 while(venueObjectList[count]!=undefined)
+	 {
+		for (var i=0;i<(EventObjectList[eventPosition].Location).length;i++)
+		{
+			if (venueObjectList[count].Name==EventObjectList[eventPosition].Location[i])
+			{
+				venueString+="<span class='venueClass'>"+venueObjectList[count].Name+"</span><br>";
+				venueString+=venueObjectList[count].Address+"<br>";
+				venueString+=venueObjectList[count].City+", "+venueObjectList[count].State+" "+venueObjectList[count].Zip+"<br>";
+				venueString+="General Phone: "+venueObjectList[count].Phone+"<br><br>";
+			}
+		}
+		count++;
+	 }
+	 /*
+	tempObj.Address=listItem4.get_item(streetString);
+	tempObj.City=listItem4.get_item(cityString);
+	tempObj.State=listItem4.get_item(stateString);
+	tempObj.Zip=listItem4.get_item(zipString);
+	tempObj.Phone=listItem4.get_item(reservationString);*/
+	 
 	 markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>"+
 	 "<title>T&C Report</title><body><center><h2>2016 Annual Meeting of the Association of Network"+
-	 " Representatives</h2><div id='location'><strong>Wisconsin Center</strong><br>400 West Wisconsin Avenue<br>Milwaukee, WI 53203<br>General Phone: 414-908-6001"+
+	 " Representatives</h2><div id='location'>"+venueString+""+
 	 "</div><br></center>";  
 	 //Loop through all the items  
 	var order=0;
@@ -174,16 +264,15 @@ function onSucceededCallback(sender, args) {
 		//gets the name of the event this session belongs to
 		
 		//Stores the day of week, day, and the month into separate arrays
-		sessionFullDate[order]=new Date(listItem.get_item('Start_x0020_DateTime'));
+		sessionFullDate[order]=new Date(listItem.get_item(startTimeString));
 		//full date of the session to check for range
 		
-		yearArray[order]=((listItem.get_item('Start_x0020_DateTime')).getFullYear());
+		yearArray[order]=((listItem.get_item(startTimeString)).getFullYear());
 		
 		//startHour gets the hour of the start time
-		var startHour=((listItem.get_item('Start_x0020_DateTime')).getHours());
-
+		var startHour=((listItem.get_item(startTimeString)).getHours());
 		//startMinute get the minute of the start time
-		var startMinute=(listItem.get_item('Start_x0020_DateTime')).getMinutes();
+		var startMinute=(listItem.get_item(startTimeString)).getMinutes();
 			
 		//Execute code if session in event we want to query and in date range
 		if ((eventName==eventWant)&&(sessionFullDate[order]>=startDate)&&(sessionFullDate[order]<=endDate))
@@ -192,36 +281,60 @@ function onSucceededCallback(sender, args) {
 			var ampmString=(ampmAttach(startHour)).ampmString;
 			startHour=(ampmAttach(startHour)).hour;
 			
-			if (startHour.toString().length==1) {startHour="0"+String(startHour);}
-			else {startHour=String(startHour);}
 			//adds a 0 to the string startHour if it has 1 digit
+			if (startHour.toString().length==1) 
+			{
+				startHour="0"+String(startHour);
+			}
+			else 
+			{
+				startHour=String(startHour);
+			}
 			
-			if (startMinute.toString().length==1) {startMinute="0"+String(startMinute);}
-			else {startMinute=String(startMinute);}
 			//adds a 0 to the string startMinute if it has 1 digit
+			if (startMinute.toString().length==1) 
+			{
+				startMinute="0"+String(startMinute);
+			}
+			else 
+			{
+				startMinute=String(startMinute);
+			}
 			
 			var timeStart=startHour+":"+startMinute+ampmString;
 			//make the timeStart string to represent start time
 			
-			var endHour=((listItem.get_item('End_x0020_DateTime')).getHours());
+			var endHour=((listItem.get_item(endTimeString)).getHours());
 			//endHour gets the hour of the end time
-			var endMinute=(listItem.get_item('End_x0020_DateTime')).getMinutes();
+			var endMinute=(listItem.get_item(endTimeString)).getMinutes();
 			//endMinute gets the minute of the end time
 			
 			//Changing the format from 24-hour to am/pm for end time
 			var ampmString2=(ampmAttach(endHour)).ampmString;
 			endHour=(ampmAttach(endHour)).hour;
 			
-			if (endHour.toString().length==1) {endHour="0"+String(endHour);}
-			else {endHour=String(endHour);}
 			//adds a 0 to the string endHour if it has 1 digit
+			if (endHour.toString().length==1) 
+			{
+				endHour="0"+String(endHour);
+			}
+			else 
+			{
+				endHour=String(endHour);
+			}
 			
-			if (endMinute.toString().length==1) {endMinute="0"+String(endMinute);}
-			else {endMinute=String(endMinute);}
 			//adds a 0 to the string endMinute if it has 1 digit
-
-			var timeEnd=endHour+":"+endMinute+ampmString2;
+			if (endMinute.toString().length==1) 
+			{
+				endMinute="0"+String(endMinute);
+			}
+			else 
+			{
+				endMinute=String(endMinute);
+			}
+			
 			//make the timeEnd string to represent end time
+			var timeEnd=endHour+":"+endMinute+ampmString2;
 			
 			var roomName=listItem.get_item('Room_x0020_Name');
 			if (roomName==null)
@@ -242,6 +355,7 @@ function onSucceededCallback(sender, args) {
 			var speakerString="";
 			var hostString="";
 			var chairpersonString="";
+			
 			//iterate through each contact				
 			while(listItem.get_item('Speakers')[count]!=undefined)
 			{
@@ -249,8 +363,6 @@ function onSucceededCallback(sender, args) {
 				var tempStr=(tempContact).get_lookupValue();//get the name of a speaker
 				tempContactString="";
 				//count is the number order of the speaker for a specific session
-					
-				tempContactString+="<span class='contactName'>"+tempStr+"</span><br>";
 				
 				//Get contact value and add to markup
 				var speakerNum=-1;
@@ -263,6 +375,14 @@ function onSucceededCallback(sender, args) {
 						break;
 					}
 				}
+									
+				//Add OK to the end of speaker if needed (speakerAgreement is true)
+				var agreementString="";
+				if(speakerObjectList[speakerNum].Agreement)
+				{
+					agreementString="<span class='okClass'> OK</span>"
+				}
+				tempContactString+="<span class='contactName'>"+tempStr+"</span>"+agreementString+"<br>";
 				
 				//display all the data for a specific speaker if it's not null
 				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Job);
@@ -291,7 +411,6 @@ function onSucceededCallback(sender, args) {
 				//contactString+=displayNotNullData("Address: ", speakerObjectList[speakerNum].Address);
 				//contactString+=displayNotNullData("City: ", speakerObjectList[speakerNum].City);
 				//contactString+=displayNotNullData("State: ", speakerObjectList[speakerNum].State);
-
 				//contactString+="Designations: "+speakerDesignation[speakerNum]+"<br>";
 				//contactString+="FR: "+speakerFR[speakerNum]+"<br>";
 				//contactString+="NO: "+speakerNO[speakerNum]+"<br>";
@@ -303,65 +422,17 @@ function onSucceededCallback(sender, args) {
 				
 				//contactString+="Agreement: "+speakerAgree[speakerNum]+"<br>";
 				//contactString+="Compliance: "+speakerCom[speakerNum]+"<br>";
-
 				count++; //Increment count until there are no more contacts
 			}
 			
-			//First contact type to show up, so there is no space before that type
-			var firstContactType=true;
+			//reset firstContactType to true
+			firstContactType=true;
 			//The following decides the order of the type of contact that will show up
-			if (speakerString!="")
-			{
-				if (!firstContactType)
-				{
-					contactString+="<br>";
-				}
-				else
-				{
-					firstContactType=false;
-				}
-				contactString+="<span class='contactType'>Speakers:</span><br>";
-				contactString+=speakerString;
-			}
-			if (hostString!="")
-			{
-				if (!firstContactType)
-				{
-					contactString+="<br>";
-				}
-				else
-				{
-					firstContactType=false;
-				}
-				contactString+="<span class='contactType'>Hosts:</span><br>";
-				contactString+=hostString;
-			}
-			if (generalString!="")
-			{
-				if (!firstContactType)
-				{
-					contactString+="<br>";
-				}
-				else
-				{
-					firstContactType=false;
-				}
-				contactString+="<span class='contactType'>General:</span><br>";
-				contactString+=generalString;
-			}
-			if (chairpersonString!="")
-			{
-				if (!firstContactType)
-				{
-					contactString+="<br>";
-				}
-				else
-				{
-					firstContactType=false;
-				}
-				contactString+="<span class='contactType'>Chairperson:</span><br>";
-				contactString+=chairpersonString;
-			}
+			
+			contactString+=contactAlign(speakerString, "Speakers:");
+			contactString+=contactAlign(hostString, "Hosts:");
+			contactString+=contactAlign(generalString, "General:");
+			contactString+=contactAlign(chairpersonString, "Chairperson:");
 			
 			//Whether this is a group session
 			var check="";
@@ -423,7 +494,6 @@ function onSucceededCallback(sender, args) {
 			{
 				synopsesString="<br>"+synopses;
 			}				
-
 			//Get the AV Needs for a session
 			var avNeeds=listItem.get_item('AV_x0020_Needs');
 			var avString="";
@@ -460,7 +530,6 @@ function onSucceededCallback(sender, args) {
 			}
 		}
 	}
-
 	var firstPage=true;
 	//Add each html element in the sorted array into the document to be displayed
 	for(var i=0;i<eventOrder.length;i++)
@@ -557,16 +626,29 @@ function updateEvent()
 function eventCallback(sender, args) 
 { 
 	var enumerator3 = returnedItems3.getEnumerator();  
-	while (enumerator3.moveNext()) //for each session possible
+	while (enumerator3.moveNext()) 
 	{  
+		//for each session possible populate the dropdown list
 		listItem3 = enumerator3.get_current();
 		var option = document.createElement("option");
 		eventList.push(listItem3.get_item('Title'));
 		option.value     = listItem3.get_item('Title');
 		option.innerHTML = listItem3.get_item('Title');
-
 		var selectOption = document.getElementById("listEvents");
 		selectOption.appendChild(option);
+		
+		//Stores the events into an event object list to be used later
+		var tempObj=new Object();
+		tempObj.Name=listItem3.get_item(titleString);
+		var count=0;
+		var tempLocationArray=[];
+		while(listItem3.get_item('Venue_x0020_Location')[count]!=undefined)
+		{
+			tempLocationArray.push(listItem3.get_item(venueLocationString)[count].get_lookupValue());
+			count++;
+		}
+		tempObj.Location=tempLocationArray;
+		EventObjectList.push(tempObj);
 	}
 }
 	
@@ -581,14 +663,43 @@ function displayNotNullData(preString, stringInput){
 	}
 }
 
+function contactAlign(nameString, spanString)
+{
+	if (nameString!="")
+	{
+		if (!firstContactType)
+		{
+			return "<br><span class='contactType'>"+spanString+"</span><br>"+nameString;
+		}
+		else
+		{
+			firstContactType=false;
+			return "<span class='contactType'>"+spanString+"</span><br>"+nameString;
+		}
+	}
+	return "";
+}
+
+var delayFunction = function(){
+	if(delay){
+		delay=false;
+		updateEvent();// run when delay is done
+	}
+	else {
+		delay=true;
+		setTimeout(delayFunction, DELAY); // check again in a second
+	}
+}
+
 function generateReport()
 {
-	querySpeaker ();
+	querySpeaker();
+	queryVenue();
 	queryListItems();
 }	 
 
 //The following code runs as soon as the page is loaded
-  $(document).ready( function() {
+  $(window).load( function() {
 	var selectHtml="";
 	selectHtml+="";
 	
@@ -616,5 +727,5 @@ function generateReport()
 		document.getElementById("startRange").value = "01/01/2016";
 		document.getElementById("endRange").value = "01/01/2020";
 	}*/
-	updateEvent();
+	delayFunction();
 	});
