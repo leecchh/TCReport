@@ -15,7 +15,7 @@
 	var NOON=12;
 	var MINUTEINHOUR=60.0;
 	var HOURINDAY=24.0;
-	var DELAY=250;
+	var DELAY=200;
 		
 	//This variable will hold a reference to the Events list items collection  
 	var eventList=[];
@@ -39,6 +39,9 @@
 	var sessionFullDate=[];
 	var currentDate;
 	var delay=false;
+	//Array of venue objects containing venue information
+	var venueObjectList=[];
+	var EventObjectList=[];
 	  
 	//Dictionaries of constants
 	var monthDictionary = {};
@@ -64,7 +67,7 @@
 	dayOfWeekDictionary[5]="FRIDAY";
 	dayOfWeekDictionary[6]="SATURDAY";
 	
-	//Strings for speaker attributes
+	//Strings for speaker attributes and venue attributes
 	var titleString='Title';
 	var jobString='Job_x0020_Title';
 	var streetString='Street_x0020_Address';
@@ -80,10 +83,11 @@
 	var contactString='Contact_x0020_Type';
 	var speakerAgreeString='Speaker_x0020_agreement';
 	var speakerComplianceString='Speaker_x0020_Compliance';
+	var zipString='Zip_x0020_Code';
+	var reservationString='Reservation_x0020_Phone';
 	
 	var startTimeString='Start_x0020_DateTime';
 	var endTimeString='End_x0020_DateTime';
-	
 					
 	//First contact type to show up, so there is no space before that type
 	var firstContactType=true;
@@ -111,8 +115,6 @@
 	{
 	//Items returned from the query
 	var enumerator2 = returnedItems2.getEnumerator();  
-	//counter to keep track of which contact we're on
-	var counter=0;
 		while (enumerator2.moveNext()) 
 		{  
 			listItem2 = enumerator2.get_current();
@@ -134,9 +136,46 @@
 			tempObj.Agreement=listItem2.get_item(speakerAgreeString);
 			tempObj.Compliance=listItem2.get_item(speakerComplianceString);
 			speakerObjectList.push(tempObj);
-			counter++;//increment counter to move onto next contact
 		}
 	}
+	
+	function queryVenue()
+	{
+		var context4;
+		var list4;
+		var caml4;
+		//Get the current context  
+		context4 = new SP.ClientContext();  
+		//Get the Sessions list. Alter this code to match the name of your list  
+		list4 = context4.get_web().get_lists().getByTitle('Venues');  
+		//Create a new CAML query
+		caml4 = new SP.CamlQuery();  
+		caml4.set_viewXml('<View><RowLimit>1000</RowLimit></View>');  
+		//Specify the query and load the list oject  
+		returnedItems4 = list4.getItems(caml4);  
+		context4.load(returnedItems4);  
+		//Run the query asynchronously, passing the functions to call when a response arrives  
+		context4.executeQueryAsync(venueCallback, onFailedCallback);
+	}
+	function venueCallback(sender, args) 
+	{
+	//Items returned from the query
+	var enumerator4 = returnedItems4.getEnumerator();  
+		while (enumerator4.moveNext()) 
+		{  
+			listItem4 = enumerator4.get_current();
+			//Store each type of data in an object for each venue, each field is part of the contact	
+			var tempObj=new Object();
+			tempObj.Name=listItem4.get_item(titleString);
+			tempObj.Address=listItem4.get_item(streetString);
+			tempObj.City=listItem4.get_item(cityString);
+			tempObj.State=listItem4.get_item(stateString);
+			tempObj.Zip=listItem4.get_item(zipString);
+			tempObj.Phone=listItem4.get_item(reservationString);
+			venueObjectList.push(tempObj);
+		}
+	}
+	
 	//This function loads the list and runs the query to produce the table
 	function queryListItems() { 
 		startDate=new Date(document.getElementById("startRange").value);
@@ -185,9 +224,51 @@
          enumerator = returnedItems.getEnumerator();  
          //Formulate HTML from the list items  
 		 //Writing the title and styling it
+		 
+		 var eventPosition=-1;
+		 for (var i=0;i<EventObjectList.length;i++) 
+		 {
+			//If the event in position i is the event we want
+			if (EventObjectList[i].Name==eventWant)
+			{
+				//Store the event position
+				eventPosition=i;
+				break;
+			}
+		 }
+		 
+		var venueString="";
+		 var count=0;
+		 //Only print out the venues that are tied to the event
+		 while(venueObjectList[count]!=undefined)
+		 {
+			for (var i=0;i<(EventObjectList[eventPosition].Location).length;i++)
+			{
+				if (venueObjectList[count].Name==EventObjectList[eventPosition].Location[i])
+				{
+					venueString+="<span class='venueClass'>"+venueObjectList[count].Name+"</span><br>";
+					venueString+=venueObjectList[count].Address+"<br>";
+					venueString+=venueObjectList[count].City+", "+venueObjectList[count].State+" "+venueObjectList[count].Zip+"<br>";
+					venueString+="General Phone: "+venueObjectList[count].Phone+"<br><br>";
+				}
+			}
+			count++;
+		 }
+		 
+		 
+		 ///////////////////////////////////////////////////////////////////////////////ONLY SHOW VENUES RELATED TO EVENT SELECTED
+		 /*
+		 alert(venueObjectList[0].Name);
+		tempObj.Address=listItem4.get_item(streetString);
+		tempObj.City=listItem4.get_item(cityString);
+		tempObj.State=listItem4.get_item(stateString);
+		tempObj.Zip=listItem4.get_item(zipString);
+		tempObj.Phone=listItem4.get_item(reservationString);
+		venueObjectList.push(tempObj);*/
+		 
          markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>"+
 		 "<title>T&C Report</title><body><center><h2>2016 Annual Meeting of the Association of Network"+
-		 " Representatives</h2><div id='location'><strong>Wisconsin Center</strong><br>400 West Wisconsin Avenue<br>Milwaukee, WI 53203<br>General Phone: 414-908-6001"+
+		 " Representatives</h2><div id='location'>"+venueString+""+
 		 "</div><br></center>";  
          //Loop through all the items  
 		var order=0;
@@ -561,8 +642,9 @@
 	function eventCallback(sender, args) 
 	{ 
         var enumerator3 = returnedItems3.getEnumerator();  
-        while (enumerator3.moveNext()) //for each session possible
+        while (enumerator3.moveNext()) 
 		{  
+			//for each session possible populate the dropdown list
 			listItem3 = enumerator3.get_current();
 			var option = document.createElement("option");
 			eventList.push(listItem3.get_item('Title'));
@@ -570,6 +652,19 @@
 			option.innerHTML = listItem3.get_item('Title');
 			var selectOption = document.getElementById("listEvents");
 			selectOption.appendChild(option);
+			
+			//Stores the events into an event object list to be used later
+			var tempObj=new Object();
+			tempObj.Name=listItem3.get_item(titleString);
+			var count=0;
+			var tempLocationArray=[];
+			while(listItem3.get_item('Venue_x0020_Location')[count]!=undefined)
+			{
+				tempLocationArray.push(listItem3.get_item('Venue_x0020_Location')[count].get_lookupValue());
+				count++;
+			}
+			tempObj.Location=tempLocationArray;
+			EventObjectList.push(tempObj);
 		}
 	}
 		
@@ -608,18 +703,19 @@
   		}
   		else {
   			delay=true;
-			setTimeout(delayFunction, 250); // check again in a second
+			setTimeout(delayFunction, DELAY); // check again in a second
   		}
   	}
 	
 	function generateReport()
 	{
-		querySpeaker ();
+		querySpeaker();
+		queryVenue();
 		queryListItems();
 	}	 
 	
 	//The following code runs as soon as the page is loaded
-	  $(document).ready( function() {
+	  $(window).load( function() {
 		var selectHtml="";
 		selectHtml+="";
 		
@@ -651,11 +747,11 @@
 		});
 </script>
 
-<!-- Fix event loading bug (Add in delay again) -->
 <!-- External JS file, smaller functions-->
-<!-- Display venue data on top (query the venues list and find a venue/venues to the event)-->
-<!-- Add other types of contacts to Sharepoint? Such as CEO or beneficiary? Add according to what I see in the reports-->
+<!-- Check boxes for which speaker data we want to pull-->
+<!-- Ask add other types of contacts to Sharepoint? Such as CEO or beneficiary? Add according to what I see in the reports-->
 <!-- Ask Andrew about "ok" at end of speaker, agreement or compliance-->
+<!-- Sort venues in alp order-->
 
 <!-- User Login for specific notes, userId, name  ctx.ctxId = 32; (540) (566) CTXNum="36"-->
 <!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
