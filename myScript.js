@@ -74,9 +74,25 @@ var speakerComplianceString='Speaker_x0020_Compliance';
 var zipString='Zip_x0020_Code';
 var reservationString='Reservation_x0020_Phone';
 var venueLocationString='Venue_x0020_Location';
+var roomNameString='Room_x0020_Name';
+var roomLocationString='Room_x0020_Location';
 
 var startTimeString='Start_x0020_DateTime';
 var endTimeString='End_x0020_DateTime';
+
+//Boolean variables for what information to show in report
+var jobTitleBool=false;
+var phoneNumberBool=false;
+var emailBool=false;
+var addressBool=false;
+var cityStateBool=false;
+var faxNumberBool=false;
+var designationsBool=false;
+var FRNumberBool=false;
+var NONumberBool=false;
+var DNONumberBool=false;
+var speakerAgreeBool=false;
+var speakerComplianceBool=false;
 				
 //First contact type to show up, so there is no space before that type
 var firstContactType=true;
@@ -176,6 +192,21 @@ function queryListItems() {
 	var yourSelect = document.getElementById( "listEvents" );	
 	//Check if user has selected an event to generate report
 	eventWant=yourSelect.options[ yourSelect.selectedIndex ].value;
+	
+	//Process which boxes are checked to display contact information accordingly
+	jobTitleBool=document.getElementById("jobTitle").checked;
+	phoneNumberBool=document.getElementById("phoneNumber").checked;
+	emailBool=document.getElementById("email").checked;
+	addressBool=document.getElementById("address").checked;
+	cityStateBool=document.getElementById("cityState").checked;
+	faxNumberBool=document.getElementById("faxNumber").checked;
+	designationsBool=document.getElementById("Designations").checked;
+	FRNumberBool=document.getElementById("FRNumber").checked;
+	NONumberBool=document.getElementById("NONumber").checked;
+	DNONumberBool=document.getElementById("DNONumber").checked;
+	speakerAgreeBool=document.getElementById("speakerAgree").checked;
+	speakerComplianceBool=document.getElementById("speakerCompliance").checked;
+	
 	if ((eventWant=="base")==true)
 	{
 		alert('Please Select an Event');
@@ -205,9 +236,10 @@ function queryListItems() {
 		context.executeQueryAsync(onSucceededCallback, onFailedCallback);  
 	}
 }  
-
-  //This function fires when the query completes successfully  
-function onSucceededCallback(sender, args) {  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //This main function creates the report when the button is clicked
+function onSucceededCallback(sender, args) 
+{  
 	 //Get an enumerator for the items in the list 
 	var enumerator;
 	 enumerator = returnedItems.getEnumerator();  
@@ -336,14 +368,14 @@ function onSucceededCallback(sender, args) {
 			//make the timeEnd string to represent end time
 			var timeEnd=endHour+":"+endMinute+ampmString2;
 			
-			var roomName=listItem.get_item('Room_x0020_Name');
+			var roomName=listItem.get_item(roomNameString);
 			if (roomName==null)
 			{
 				roomName="None";//set room name to none
 			}
 			
 			//gets the room location
-			var roomLocation=listItem.get_item('Room_x0020_Location');
+			var roomLocation=listItem.get_item(roomLocationString);
 			
 			//count to keep track of which contact we're on
 			var count=0;
@@ -384,12 +416,28 @@ function onSucceededCallback(sender, args) {
 				}
 				tempContactString+="<span class='contactName'>"+tempStr+"</span>"+agreementString+"<br>";
 				
-				//display all the data for a specific speaker if it's not null
+				//display all the data for a specific speaker if it's not null, given that it is checked in the checkbox by the user
+				/*
+				jobTitleBool=document.getElementById("jobTitle").checked;
+				phoneNumberBool=document.getElementById("phoneNumber").checked;
+				emailBool=document.getElementById("email").checked;
+				addressBool=document.getElementById("address").checked;
+				cityStateBool=document.getElementById("cityState").checked;
+				faxNumberBool=document.getElementById("faxNumber").checked;
+				designationsBool=document.getElementById("Designations").checked;
+				FRNumberBool=document.getElementById("FRNumber").checked;
+				NONumberBool=document.getElementById("NONumber").checked;
+				DNONumberBool=document.getElementById("DNONumber").checked;
+				speakerAgreeBool=document.getElementById("speakerAgree").checked;
+				speakerComplianceBool=document.getElementById("speakerCompliance").checked;*/
+				//Put the above in a function and process if checked
+	
 				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Job);
 				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Phone);
 				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Email);	
 				
 				//Check what type of contact this is and add to the specific string
+				//Add to the following list when new types of contacts are added
 				switch(speakerObjectList[speakerNum].Contact) {
 					case "Host":
 						hostString+=tempContactString;
@@ -427,8 +475,9 @@ function onSucceededCallback(sender, args) {
 			
 			//reset firstContactType to true
 			firstContactType=true;
-			//The following decides the order of the type of contact that will show up
 			
+			//The following decides the order of the type of contact that will show up
+			//Add to the following list when new types of contacts are added
 			contactString+=contactAlign(speakerString, "Speakers:");
 			contactString+=contactAlign(hostString, "Hosts:");
 			contactString+=contactAlign(generalString, "General:");
@@ -468,7 +517,7 @@ function onSucceededCallback(sender, args) {
 			var locationStr="";
 			if (roomLocation!=null)//if location is not null then set the location
 			{
-				locationStr="<br>"+listItem.get_item('Room_x0020_Location')+" - "+roomName;
+				locationStr="<br>"+listItem.get_item(roomLocationString)+" - "+roomName;
 			}
 			
 			//Gets the audience of the session
@@ -572,7 +621,7 @@ function onSucceededCallback(sender, args) {
 	newdocument.write(markup);
 	newdocument.close();
 }  
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //This function fires when the query fails  
 function onFailedCallback(sender, args) {  
   //Display the details  

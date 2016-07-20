@@ -2,23 +2,23 @@
 <!--MAKE SURE POP UP IS NOT BLOCKED-->
 <!--USE INTERNET EXPLORER BROWSER TO ENSURE NO ERRORS-->
 <!--DISABLE SKYPE PLUGIN TO GET RID OF SKYPE BUTTON NEXT TO NUMBER-->
-<!--OPEN PAGE IN NEW TAG TO MAKE SURE DROP DOWN LIST IS LOADED CORRECTLY-->
 
 <!-- Smaller functions within big one-->
+<!-- Check boxes for which speaker data we want to pull (Start with initial plan, then go dynamic)-->
+<!-- Sort venues in alp order, if necessary-->
 
-<!-- Check boxes for which speaker data we want to pull-->
-<!-- Ask add other types of contacts to Sharepoint? Such as CEO or beneficiary? Add according to what I see in the reports-->
+<!-- Waiting on Response-->
+<!-- Ask add other types of contacts to Sharepoint? Add according to what I see in the reports-->
 <!-- Ask Andrew about "ok" at end of speaker, agreement or compliance-->
-<!-- Sort venues in alp order-->
 
-<!-- User Login for specific notes, userId, name  ctx.ctxId = 32; (540) (566) CTXNum="36"-->
-<!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
 <!-- Improve selection sort (Change it to a merge sort, extra array)-->
-
+<!-- User Login for specific notes, userId, name  ctx.ctxId = 32; (540) (566) CTXNum="36"-->
 <!-- Notification for changes made (specific people) -->
+<!-- Perform testing for date filter, see if currentDate has timezone issues and all others-->
 
 <html>
 <head>
+<!-- Change the name of myScript.js as needed -->
 <script src="/sites/fo/tacr/SiteAssets/myScript.js" language="javascript" type="text/javascript">
 </script>
 </head>
@@ -30,7 +30,20 @@
 Start Date Range: <input type="date" id="startRange" value="2016-01-01"><br>
 <!-- Setting the default end date -->
 End Date Range: <input type="date" id="endRange" value="2020-12-31"><br>
+Fields to be included with contacts:<br>
+<input type="checkbox" id="jobTitle" checked> Job Title<br>
+<input type="checkbox" id="phoneNumber" checked> Phone Number<br>
+<input type="checkbox" id="email" checked> Email<br>
+<input type="checkbox" id="address"> Address<br>
+<input type="checkbox" id="cityState"> City and State<br>
+<input type="checkbox" id="faxNumber"> Fax Number<br>
+<input type="checkbox" id="Designations"> Designations<br>
+<input type="checkbox" id="FRNumber"> FR Number<br>
+<input type="checkbox" id="NONumber"> NO Number<br>
+<input type="checkbox" id="DNONumber"> DNO Number<br>
+<input type="checkbox" id="speakerAgree"> Speaker Agreement<br>
+<input type="checkbox" id="speakerCompliance"> Speaker Compliance<br>
 <br><br>
-<div><button id="queryButton" onclick=" generateReport()">Create Report</button></div>
+<span><button id="queryButton" onclick=" generateReport()">Create Report</button></span>
 </body>
 </html>
