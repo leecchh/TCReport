@@ -416,25 +416,21 @@ function onSucceededCallback(sender, args)
 				}
 				tempContactString+="<span class='contactName'>"+tempStr+"</span>"+agreementString+"<br>";
 				
-				//display all the data for a specific speaker if it's not null, given that it is checked in the checkbox by the user
-				/*
-				jobTitleBool=document.getElementById("jobTitle").checked;
-				phoneNumberBool=document.getElementById("phoneNumber").checked;
-				emailBool=document.getElementById("email").checked;
-				addressBool=document.getElementById("address").checked;
-				cityStateBool=document.getElementById("cityState").checked;
-				faxNumberBool=document.getElementById("faxNumber").checked;
-				designationsBool=document.getElementById("Designations").checked;
-				FRNumberBool=document.getElementById("FRNumber").checked;
-				NONumberBool=document.getElementById("NONumber").checked;
-				DNONumberBool=document.getElementById("DNONumber").checked;
-				speakerAgreeBool=document.getElementById("speakerAgree").checked;
-				speakerComplianceBool=document.getElementById("speakerCompliance").checked;*/
-				//Put the above in a function and process if checked
-	
-				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Job);
-				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Phone);
-				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Email);	
+				//display all the data for a specific speaker if it's not null, given that it is checked in the checkbox by the user	
+				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Job, jobTitleBool);
+				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Phone, phoneNumberBool);
+				tempContactString+=displayNotNullData("", speakerObjectList[speakerNum].Email, emailBool);	
+				tempContactString+=displayNotNullData("Address: ", speakerObjectList[speakerNum].Address, addressBool);
+				tempContactString+=displayNotNullData("City: ", speakerObjectList[speakerNum].City, cityStateBool);
+				tempContactString+=displayNotNullData("State: ", speakerObjectList[speakerNum].State, cityStateBool);
+				tempContactString+=displayNotNullData("Fax: ", speakerObjectList[speakerNum].Fax, faxNumberBool);
+				tempContactString+=displayNotNullData("Designations: ", speakerObjectList[speakerNum].Designations, designationsBool);
+				tempContactString+=displayNotNullData("FR Number: ", speakerObjectList[speakerNum].FR, FRNumberBool);
+				tempContactString+=displayNotNullData("NO Number: ", speakerObjectList[speakerNum].NO, NONumberBool);
+				tempContactString+=displayNotNullData("DNO Number: ", speakerObjectList[speakerNum].DNO, DNONumberBool);
+				tempContactString+=displayNotNullData("Speaker Agreement: ", speakerObjectList[speakerNum].Agreement, speakerAgreeBool);
+				tempContactString+=displayNotNullData("Speaker Compliance: ", speakerObjectList[speakerNum].Compliance, speakerComplianceBool);
+				//Align City and State
 				
 				//Check what type of contact this is and add to the specific string
 				//Add to the following list when new types of contacts are added
@@ -454,23 +450,8 @@ function onSucceededCallback(sender, args)
 					default:
 						contactString+=tempContactString;
 				}
-				
-				//contactString+=displayNotNullData("Fax: ", speakerObjectList[speakerNum].Fax);
-				//contactString+=displayNotNullData("Address: ", speakerObjectList[speakerNum].Address);
-				//contactString+=displayNotNullData("City: ", speakerObjectList[speakerNum].City);
-				//contactString+=displayNotNullData("State: ", speakerObjectList[speakerNum].State);
-				//contactString+="Designations: "+speakerDesignation[speakerNum]+"<br>";
-				//contactString+="FR: "+speakerFR[speakerNum]+"<br>";
-				//contactString+="NO: "+speakerNO[speakerNum]+"<br>";
-				//contactString+="DNO: "+speakerDNO[speakerNum]+"<br>";
-				//if (speakerContact[speakerNum]!=null)
-				//{
-				//	contactString+="Contact Type: "+speakerContact[speakerNum]+"<br>";
-				//}
-				
-				//contactString+="Agreement: "+speakerAgree[speakerNum]+"<br>";
-				//contactString+="Compliance: "+speakerCom[speakerNum]+"<br>";
-				count++; //Increment count until there are no more contacts
+				//Increment count until there are no more contacts
+				count++;
 			}
 			
 			//reset firstContactType to true
@@ -701,8 +682,8 @@ function eventCallback(sender, args)
 	}
 }
 	
-function displayNotNullData(preString, stringInput){
-	if (stringInput!=null)
+function displayNotNullData(preString, stringInput, stringBoolean){
+	if (stringInput!=null && stringBoolean)
 	{
 		return preString+stringInput+"<br>";
 	}
