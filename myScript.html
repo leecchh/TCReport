@@ -4,7 +4,8 @@
 <!--DISABLE SKYPE PLUGIN TO GET RID OF SKYPE BUTTON NEXT TO NUMBER-->
 
 <!-- Smaller functions within big one-->
-<!-- Check boxes for which speaker data we want to pull (Start with initial plan, then go dynamic)-->
+<!-- Check box select all button-->
+<!-- Think about city-state scenarios and improve-->
 <!-- Sort venues in alp order, if necessary-->
 
 <!-- Waiting on Response-->
@@ -30,7 +31,7 @@
 Start Date Range: <input type="date" id="startRange" value="2016-01-01"><br>
 <!-- Setting the default end date -->
 End Date Range: <input type="date" id="endRange" value="2020-12-31"><br>
-Fields to be included with contacts:<br>
+<br>Contact Attributes to be Included:<br>
 <input type="checkbox" id="jobTitle" checked> Job Title<br>
 <input type="checkbox" id="phoneNumber" checked> Phone Number<br>
 <input type="checkbox" id="email" checked> Email<br>
@@ -44,6 +45,8 @@ Fields to be included with contacts:<br>
 <input type="checkbox" id="speakerAgree"> Speaker Agreement<br>
 <input type="checkbox" id="speakerCompliance"> Speaker Compliance<br>
 <br><br>
-<span><button id="queryButton" onclick=" generateReport()">Create Report</button></span>
+<span><button type="button" onclick="selectDeselectAll(true);">Select All</button></span>
+<span><button type="button" onclick="selectDeselectAll(false);">Deselect All</button></span><br><br>
+<span><button id="queryButton" onclick="generateReport()">Create Report</button></span>
 </body>
 </html>

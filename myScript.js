@@ -3,7 +3,7 @@
 var NOON=12;
 var MINUTEINHOUR=60.0;
 var HOURINDAY=24.0;
-var DELAY=200;
+var DELAY=50;
 	
 //This variable will hold a reference to the Events list items collection  
 var eventList=[];
@@ -430,7 +430,6 @@ function onSucceededCallback(sender, args)
 				tempContactString+=displayNotNullData("DNO Number: ", speakerObjectList[speakerNum].DNO, DNONumberBool);
 				tempContactString+=displayNotNullData("Speaker Agreement: ", speakerObjectList[speakerNum].Agreement, speakerAgreeBool);
 				tempContactString+=displayNotNullData("Speaker Compliance: ", speakerObjectList[speakerNum].Compliance, speakerComplianceBool);
-				//Align City and State
 				
 				//Check what type of contact this is and add to the specific string
 				//Add to the following list when new types of contacts are added
@@ -719,6 +718,22 @@ var delayFunction = function(){
 		delay=true;
 		setTimeout(delayFunction, DELAY); // check again in a second
 	}
+}
+
+function selectDeselectAll(bool)
+{
+	document.getElementById("jobTitle").checked=bool;
+	document.getElementById("phoneNumber").checked=bool;
+	document.getElementById("email").checked=bool;
+	document.getElementById("address").checked=bool;
+	document.getElementById("cityState").checked=bool;
+	document.getElementById("faxNumber").checked=bool;
+	document.getElementById("Designations").checked=bool;
+	document.getElementById("FRNumber").checked=bool;
+	document.getElementById("NONumber").checked=bool;
+	document.getElementById("DNONumber").checked=bool;
+	document.getElementById("speakerAgree").checked=bool;
+	document.getElementById("speakerCompliance").checked=bool;
 }
 
 function generateReport()
