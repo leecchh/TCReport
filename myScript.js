@@ -76,6 +76,7 @@ var reservationString='Reservation_x0020_Phone';
 var venueLocationString='Venue_x0020_Location';
 var roomNameString='Room_x0020_Name';
 var roomLocationString='Room_x0020_Location';
+var groupSessionString='Group_x0020_Session';
 
 var startTimeString='Start_x0020_DateTime';
 var endTimeString='End_x0020_DateTime';
@@ -275,12 +276,6 @@ function onSucceededCallback(sender, args)
 		}
 		count++;
 	 }
-	 /*
-	tempObj.Address=listItem4.get_item(streetString);
-	tempObj.City=listItem4.get_item(cityString);
-	tempObj.State=listItem4.get_item(stateString);
-	tempObj.Zip=listItem4.get_item(zipString);
-	tempObj.Phone=listItem4.get_item(reservationString);*/
 	 
 	 markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>"+
 	 "<title>T&C Report</title><body><center><h2>2016 Annual Meeting of the Association of Network"+
@@ -465,7 +460,7 @@ function onSucceededCallback(sender, args)
 			
 			//Whether this is a group session
 			var check="";
-			if (listItem.get_item('Group_x0020_Session')==true)
+			if (listItem.get_item(groupSessionString)==true)
 			{
 				check="Yes"
 			}
