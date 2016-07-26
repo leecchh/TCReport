@@ -518,7 +518,7 @@ function onSucceededCallback(sender, args) {
         }
         order++; //add one to the variable in order to organize the events based on start time
     }
-
+	
     //Sorts session order according to startTime
     for(var a = 0; a < sessionFullDate.length - 1; a++) {
         for(var b = a + 1; b < sessionFullDate.length; b++) {
@@ -644,6 +644,57 @@ function eventCallback(sender, args) {
         EventObjectList.push(tempObj);
     }
 }
+
+function mergeSort(arr)
+{
+    if (arr.length < 2)
+        return arr;
+ 
+    var middle = parseInt(arr.length / 2);
+    var left   = arr.slice(0, middle);
+    var right  = arr.slice(middle, arr.length);
+ 
+    return merge(mergeSort(left), mergeSort(right));
+}
+ 
+function merge(left, right)
+{
+    var result = [];
+ 
+    while (left.length && right.length) {
+        if (left[0] <= right[0]) {
+            result.push(left.shift());
+        } else {
+            result.push(right.shift());
+        }
+    }
+ 
+    while (left.length)
+        result.push(left.shift());
+ 
+    while (right.length)
+        result.push(right.shift());
+ 
+    return result;
+}
+ //REMOVEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+ /*
+for(var a = 0; a < sessionFullDate.length - 1; a++) {
+	for(var b = a + 1; b < sessionFullDate.length; b++) {
+		//compare the start time of two sessions, switch if necessary to sort list of sessions
+		if(sessionFullDate[a].getTime() > sessionFullDate[b].getTime()) {
+			//Flip the order html is made
+			var temp = eventOrder[a];
+			eventOrder[a] = eventOrder[b];
+			eventOrder[b] = temp;
+
+			//Flip the time of the session as well
+			var tempFullTime = sessionFullDate[a];
+			sessionFullDate[a] = sessionFullDate[b];
+			sessionFullDate[b] = tempFullTime;
+		}
+	}
+}*/
 
 //Display data (preString+stringInput) if stringInput is not null and stringBoolean is true
 function displayNotNullData(preString, stringInput, stringBoolean) {
