@@ -357,13 +357,13 @@ function onSucceededCallback(sender, args) {
             //count to keep track of which contact we're on
             var count = 0;
             //string of contacts to be displayed
-            var contactString = "";
+            var contactStringSum = "";
             var tempContactString = "";
             //Arrays that contain the code to display each type of contacts
-            var generalString = "";
-            var speakerString = "";
-            var hostString = "";
-            var chairpersonString = "";
+            var generalStringArray = [];
+            var speakerStringArray = [];
+            var hostStringArray = [];
+            var chairpersonStringArray = [];
 
             //iterate through each contact of the session				
             while(listItem.get_item('Speakers')[count] != undefined) {
@@ -409,40 +409,48 @@ function onSucceededCallback(sender, args) {
                 tempContactString += displayNotNullData("DNO Number: ", speakerObjectList[speakerNum].DNO, DNONumberBool);
                 tempContactString += displayNotNullData("Speaker Agreement: ", speakerObjectList[speakerNum].Agreement, speakerAgreeBool);
                 tempContactString += displayNotNullData("Speaker Compliance: ", speakerObjectList[speakerNum].Compliance, speakerComplianceBool);
+				
+				var tempObj = new Object();
+				tempObj.string=tempContactString;
+				tempObj.Name=tempStr;
 
-                //Check what type of contact this is and add to the specific string
+                //Check what type of contact this is and push the object to the specific list
                 //Add to the following list when new types of contacts are added
                 switch(speakerObjectList[speakerNum].Contact) {
                     case "Host":
-                        hostString += tempContactString;
+                        hostStringArray.push(tempObj);
                         break;
                     case "General":
-                        generalString += tempContactString;
+                        generalStringArray.push(tempObj);
                         break;
                     case "Speaker":
-                        speakerString += tempContactString;
+                        speakerStringArray.push(tempObj);
                         break;
                     case "Chairperson":
-                        chairpersonString += tempContactString;
+                        chairpersonStringArray.push(tempObj);
                         break;
                     default:
-                        contactString += tempContactString;
+                        contactStringSum+=tempContactString;
                 }
                 //Increment count until there are no more contacts
                 count++;
             }
 
-			
+			//Sorts the contacts alphabetical according to first name
+			hostStringArray=sortContact(hostStringArray);
+			generalStringArray=sortContact(generalStringArray);
+			speakerStringArray=sortContact(speakerStringArray);
+			chairpersonStringArray=sortContact(chairpersonStringArray);
 			
             //reset firstContactType to true
             firstContactType = true;
-
+			
             //The following decides the order of the type of contact that will show up
             //Add to the following list when new types of contacts are added
-            contactString += contactAlign(speakerString, "Speakers:");
-            contactString += contactAlign(hostString, "Hosts:");
-            contactString += contactAlign(generalString, "General:");
-            contactString += contactAlign(chairpersonString, "Chairperson:");
+            contactStringSum += contactAlign(combineStringArray(speakerStringArray), "Speakers:");
+            contactStringSum += contactAlign(combineStringArray(hostStringArray), "Hosts:");
+            contactStringSum += contactAlign(combineStringArray(generalStringArray), "General:");
+            contactStringSum += contactAlign(combineStringArray(chairpersonStringArray), "Chairperson:");
 
             //Whether this is a group session
             var check = "";
@@ -504,7 +512,7 @@ function onSucceededCallback(sender, args) {
             }
 
             eventOrder[order] += "<td><span class='sessionName'>" + listItem.get_item('Title') + "</span>" + costString + locationStr + audienceString + avString + synopsesString + " </td>";
-            eventOrder[order] += "<td>" + contactString + "</td>"; //shows information of the contact
+            eventOrder[order] += "<td>" + contactStringSum + "</td>"; //shows information of the contact
             eventOrder[order] += "</tr>"; //Ends the row
             //eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
         }
@@ -675,7 +683,28 @@ function selectDeselectAll(bool) {
     document.getElementById("speakerCompliance").checked = bool;
 }
 
-//Either select or deselect all the checkboxes
+//This function returns a string formed by the string of each of the objects in the array
+function combineStringArray(array) {
+	var tempString="";
+	for (var i=0;i<array.length;i++)
+	{
+		tempString+=array[i].string;
+	}
+	return tempString;
+}
+
+//Sorts the contacts alphabetically within the list of contact objects
+function sortContact(contactList){
+	var tempList=contactList;
+	tempList.sort(function(a, b){
+		if(a.Name < b.Name) return -1;
+		if(a.Name > b.Name) return 1;
+		return 0;
+	})
+	return tempList;
+}
+
+//In progress
 function returnAttribute(){
 	
 }
