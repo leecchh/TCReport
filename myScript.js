@@ -1,4 +1,4 @@
-//This example gets all the items in the Events list, up to 1000 elements  
+//Constant variables
 var NOON = 12;
 var MINUTEINHOUR = 60.0;
 var HOURINDAY = 24.0;
@@ -94,6 +94,9 @@ var speakerComplianceBool = false;
 
 //First contact type to show up, so there is no space before that type
 var firstContactType = true;
+
+//Keep track of which attribute we're displaying
+var returnAttributeNumber=0;
 
 //Queryspeaker and speakerCallback stores all the speaker/contact details in objects
 function querySpeaker() {
@@ -246,8 +249,17 @@ function onSucceededCallback(sender, args) {
         }
     }
 
+	//Initialize venueString to be displayed
     var venueString = "";
     var count = 0;
+	
+	//Sorts the venueObjectList by alphabetical order
+	venueObjectList.sort(function(a, b){
+		if(a.Name < b.Name) return -1;
+		if(a.Name > b.Name) return 1;
+		return 0;
+	})
+
     //Only print out the venues that are tied to the event
     while(venueObjectList[count] != undefined) {
         for(var i = 0; i < (EventObjectList[eventPosition].Location).length; i++) {
@@ -288,8 +300,8 @@ function onSucceededCallback(sender, args) {
         //Execute code if session in event we want to query and in date range
         if((eventName == eventWant) && (sessionFullDate[order] >= startDate) && (sessionFullDate[order] <= endDate)) {
             //Changing the format from 24-hour to am/pm for start time
-            var ampmString = (ampmAttach(startHour)).ampmString;
-            startHour = (ampmAttach(startHour)).hour;
+            var ampmString = (attachAmpmString(startHour)).ampmString;
+            startHour = (attachAmpmString(startHour)).hour;
 
             //adds a 0 to the string startHour if it has 1 digit
             if(startHour.toString().length == 1) {
@@ -314,8 +326,8 @@ function onSucceededCallback(sender, args) {
             //endMinute gets the minute of the end time
 
             //Changing the format from 24-hour to am/pm for end time
-            var ampmString2 = (ampmAttach(endHour)).ampmString;
-            endHour = (ampmAttach(endHour)).hour;
+            var ampmString2 = (attachAmpmString(endHour)).ampmString;
+            endHour = (attachAmpmString(endHour)).hour;
 
             //adds a 0 to the string endHour if it has 1 digit
             if(endHour.toString().length == 1) {
@@ -353,10 +365,11 @@ function onSucceededCallback(sender, args) {
             var hostString = "";
             var chairpersonString = "";
 
-            //iterate through each contact				
+            //iterate through each contact of the session				
             while(listItem.get_item('Speakers')[count] != undefined) {
                 var tempContact = listItem.get_item('Speakers')[count];
-                var tempStr = (tempContact).get_lookupValue(); //get the name of a speaker
+				//get the name of a speaker/contact
+                var tempStr = (tempContact).get_lookupValue(); 
                 tempContactString = "";
                 //count is the number order of the speaker for a specific session
 
@@ -382,8 +395,13 @@ function onSucceededCallback(sender, args) {
                 tempContactString += displayNotNullData("", speakerObjectList[speakerNum].Phone, phoneNumberBool);
                 tempContactString += displayNotNullData("", speakerObjectList[speakerNum].Email, emailBool);
                 tempContactString += displayNotNullData("Address: ", speakerObjectList[speakerNum].Address, addressBool);
-                tempContactString += displayNotNullData("City: ", speakerObjectList[speakerNum].City, cityStateBool);
-                tempContactString += displayNotNullData("State: ", speakerObjectList[speakerNum].State, cityStateBool);
+				if ((speakerObjectList[speakerNum].City!=null)&&(speakerObjectList[speakerNum].State!=null)){
+					tempContactString += displayNotNullData("", speakerObjectList[speakerNum].City+", "+speakerObjectList[speakerNum].State, cityStateBool);
+				}
+				else{
+					tempContactString += displayNotNullData("City: ", speakerObjectList[speakerNum].City, cityStateBool);
+					tempContactString += displayNotNullData("State: ", speakerObjectList[speakerNum].State, cityStateBool);
+				}
                 tempContactString += displayNotNullData("Fax: ", speakerObjectList[speakerNum].Fax, faxNumberBool);
                 tempContactString += displayNotNullData("Designations: ", speakerObjectList[speakerNum].Designations, designationsBool);
                 tempContactString += displayNotNullData("FR Number: ", speakerObjectList[speakerNum].FR, FRNumberBool);
@@ -414,6 +432,8 @@ function onSucceededCallback(sender, args) {
                 count++;
             }
 
+			
+			
             //reset firstContactType to true
             firstContactType = true;
 
@@ -554,7 +574,7 @@ function onFailedCallback(sender, args) {
 }
 
 //Attaches either "am" or "pm" at the end of the string according to the time
-function ampmAttach(Hour) {
+function attachAmpmString(Hour) {
     var tempObject = new Object();
     if(Hour > NOON) {
         tempObject.hour = Hour - NOON;
@@ -639,6 +659,7 @@ function contactAlign(nameString, spanString) {
     return "";
 }
 
+//Either select or deselect all the checkboxes
 function selectDeselectAll(bool) {
     document.getElementById("jobTitle").checked = bool;
     document.getElementById("phoneNumber").checked = bool;
@@ -654,6 +675,12 @@ function selectDeselectAll(bool) {
     document.getElementById("speakerCompliance").checked = bool;
 }
 
+//Either select or deselect all the checkboxes
+function returnAttribute(){
+	
+}
+
+//Runs 3 functions to generate the report
 function generateReport() {
     querySpeaker();
     queryVenue();
