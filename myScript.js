@@ -15,14 +15,10 @@ var listItem2;
 var listItem3;
 var sel;
 var opt;
-//variables for ordering events by time
-var eventOrder = [];
-var yearArray = [];
 //Array of speaker objects containing speaker information
 var speakerObjectList = [];
 var startDate;
 var endDate;
-var sessionFullDate = [];
 var currentDate;
 //Array of venue objects containing venue information
 var venueObjectList = [];
@@ -97,6 +93,9 @@ var firstContactType = true;
 
 //Keep track of which attribute we're displaying
 var returnAttributeNumber=0;
+
+//Array of sessionOrderObject for sorting session according to start time
+var sessionOrderObjectArray=[];
 
 //Queryspeaker and speakerCallback stores all the speaker/contact details in objects
 function querySpeaker() {
@@ -278,19 +277,17 @@ function onSucceededCallback(sender, args) {
         " Representatives</h2><div id='location'>" + venueString + "" +
         "</div><br></center>";
     //Loop through all the items  
-    var order = 0;
     while(enumerator.moveNext()) //for each session possible
     {
-        eventOrder[order] = ""; //initialize string to be apended
+        var tempEventString= ""; //initialize string to be apended
+		var tempFullDate;
         listItem = enumerator.get_current();
         var eventName = (listItem.get_item('Event')).get_lookupValue();
         //gets the name of the event this session belongs to
 
         //Stores the day of week, day, and the month into separate arrays
-        sessionFullDate[order] = new Date(listItem.get_item(startTimeString));
+        tempFullDate = new Date(listItem.get_item(startTimeString));
         //full date of the session to check for range
-
-        yearArray[order] = ((listItem.get_item(startTimeString)).getFullYear());
 
         //startHour gets the hour of the start time
         var startHour = ((listItem.get_item(startTimeString)).getHours());
@@ -298,7 +295,7 @@ function onSucceededCallback(sender, args) {
         var startMinute = (listItem.get_item(startTimeString)).getMinutes();
 
         //Execute code if session in event we want to query and in date range
-        if((eventName == eventWant) && (sessionFullDate[order] >= startDate) && (sessionFullDate[order] <= endDate)) {
+        if((eventName == eventWant) && (tempFullDate >= startDate) && (tempFullDate <= endDate)) {
             //Changing the format from 24-hour to am/pm for start time
             var ampmString = (attachAmpmString(startHour)).ampmString;
             startHour = (attachAmpmString(startHour)).hour;
@@ -460,9 +457,9 @@ function onSucceededCallback(sender, args) {
                 check = "No"
             }
 
-            //add the variables to eventOrder
+            //add the variables to tempEventString
             //Decides the order of the columns
-            eventOrder[order] += "<tr>"; //Starts the row
+            tempEventString += "<tr>"; //Starts the row
 
             var publishStr = "";
             //if field is false then write out DO NOT PUBLISH under session name
@@ -475,7 +472,7 @@ function onSucceededCallback(sender, args) {
                 confirmString = "<br> <span class='confirmStyle'>CONFIRMED</span>";
             }
 
-            eventOrder[order] += "<td><div class='time'>" + String(timeStart) + " - " + String(timeEnd) + " <br> </div>" + listItem.get_item('Source') + confirmString + publishStr + "</td>";
+            tempEventString += "<td><div class='time'>" + String(timeStart) + " - " + String(timeEnd) + " <br> </div>" + listItem.get_item('Source') + confirmString + publishStr + "</td>";
             //Prints out the time, source, and whether it should be published
 
             var locationStr = "";
@@ -511,62 +508,50 @@ function onSucceededCallback(sender, args) {
                 avString = "<br>" + avNeeds;
             }
 
-            eventOrder[order] += "<td><span class='sessionName'>" + listItem.get_item('Title') + "</span>" + costString + locationStr + audienceString + avString + synopsesString + " </td>";
-            eventOrder[order] += "<td>" + contactStringSum + "</td>"; //shows information of the contact
-            eventOrder[order] += "</tr>"; //Ends the row
-            //eventOrder[order] += 'Group Session: ' + check+'<br>';//Gets whether it is a group session
+            tempEventString += "<td><span class='sessionName'>" + listItem.get_item('Title') + "</span>" + costString + locationStr + audienceString + avString + synopsesString + " </td>";
+            tempEventString += "<td>" + contactStringSum + "</td>"; //shows information of the contact
+            tempEventString += "</tr>"; //Ends the row
+			
+			//Creates the object that contains the string to be displayed and the date associated with the event
+			var sessionOrderObject = new Object();
+			sessionOrderObject.string=tempEventString;
+			sessionOrderObject.date=tempFullDate;
+			sessionOrderObjectArray.push(sessionOrderObject);
         }
-        order++; //add one to the variable in order to organize the events based on start time
     }
 	
     //Sorts session order according to startTime
-    for(var a = 0; a < sessionFullDate.length - 1; a++) {
-        for(var b = a + 1; b < sessionFullDate.length; b++) {
-            //compare the start time of two sessions, switch if necessary to sort list of sessions
-            if(sessionFullDate[a].getTime() > sessionFullDate[b].getTime()) {
-                //Flip the order html is made
-                var temp = eventOrder[a];
-                eventOrder[a] = eventOrder[b];
-                eventOrder[b] = temp;
-
-                //Flip the time of the session as well
-                var tempFullTime = sessionFullDate[a];
-                sessionFullDate[a] = sessionFullDate[b];
-                sessionFullDate[b] = tempFullTime;
-            }
-        }
-    }
+	sessionOrderObjectArray=sortEvents(sessionOrderObjectArray);
+	
     var firstPage = true;
     //Add each html element in the sorted array into the document to be displayed
-    for(var i = 0; i < eventOrder.length; i++) {
-        //If the eventOrder is not empty, the session is in the event we want so we add it to the html
-        if(eventOrder[i] != "") {
-            var dayStr = sessionFullDate[i].getDate();
-            //Gets the string for the month from the dictionary
-            var monthStr = monthDictionary[sessionFullDate[i].getMonth()];
-            //Gets the string for the day of week from the dictionary
-            var dayOfWeekString = dayOfWeekDictionary[sessionFullDate[i].getDay()];
+    for(var i = 0; i < sessionOrderObjectArray.length; i++) {
+		var dayStr = (sessionOrderObjectArray[i].date).getDate();
+		//Gets the string for the month from the dictionary
+		var monthStr = monthDictionary[(sessionOrderObjectArray[i].date).getMonth()];
+		//Gets the string for the day of week from the dictionary
+		var dayOfWeekString = dayOfWeekDictionary[(sessionOrderObjectArray[i].date).getDay()];
 
-            //Only break if it's the first page
-            if(firstPage) {
-                markup += "<table style='width:100%'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr + "</th></tr><tr><th class='firstColumn'>Time</th>" +
-                    "<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
-            } else {
-                markup += "<table style='width:100%' class='tableBreak'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr + "</th></tr><tr><th class='firstColumn'>Time</th>" +
-                    "<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
-            }
+		//Only break if it's the first page
+		if(firstPage) {
+			markup += "<table style='width:100%'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr + "</th></tr><tr><th class='firstColumn'>Time</th>" +
+				"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
+		} else {
+			markup += "<table style='width:100%' class='tableBreak'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr + "</th></tr><tr><th class='firstColumn'>Time</th>" +
+				"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
+		}
+		
+		//Mark that it is past the first page
+		firstPage = false;
 
-            firstPage = false;
+		markup += sessionOrderObjectArray[i].string;
+		//While loop to link all sessions in same day to the same table
+		while(i < sessionOrderObjectArray.length - 1 && (sessionOrderObjectArray[i].date).getDate() == (sessionOrderObjectArray[i+1].date).getDate() && (sessionOrderObjectArray[i].date).getMonth() == (sessionOrderObjectArray[i+1].date).getMonth()) {
+			i++;
+			markup += sessionOrderObjectArray[i].string;
+		}
 
-            markup += eventOrder[i];
-            //While loop to link all sessions in same day to the same table
-            while(i < eventOrder.length - 1 && sessionFullDate[i].getDate() == sessionFullDate[i + 1].getDate() && sessionFullDate[i].getMonth() == sessionFullDate[i + 1].getMonth()) {
-                i++;
-                markup += eventOrder[i];
-            }
-
-            markup += "</table><br><br>";
-        }
+		markup += "</table><br><br>";
     }
     //open new window, MAKE SURE POP UP WINDOW IS NOT BLOCKED
     newwindow = window.open();
@@ -677,24 +662,6 @@ function merge(left, right)
  
     return result;
 }
- //REMOVEEEEEEEEEEEEEEEEEEEEEEEEEEEE
- /*
-for(var a = 0; a < sessionFullDate.length - 1; a++) {
-	for(var b = a + 1; b < sessionFullDate.length; b++) {
-		//compare the start time of two sessions, switch if necessary to sort list of sessions
-		if(sessionFullDate[a].getTime() > sessionFullDate[b].getTime()) {
-			//Flip the order html is made
-			var temp = eventOrder[a];
-			eventOrder[a] = eventOrder[b];
-			eventOrder[b] = temp;
-
-			//Flip the time of the session as well
-			var tempFullTime = sessionFullDate[a];
-			sessionFullDate[a] = sessionFullDate[b];
-			sessionFullDate[b] = tempFullTime;
-		}
-	}
-}*/
 
 //Display data (preString+stringInput) if stringInput is not null and stringBoolean is true
 function displayNotNullData(preString, stringInput, stringBoolean) {
@@ -750,6 +717,16 @@ function sortContact(contactList){
 	tempList.sort(function(a, b){
 		if(a.Name < b.Name) return -1;
 		if(a.Name > b.Name) return 1;
+		return 0;
+	})
+	return tempList;
+}
+
+function sortEvents(eventObject){
+	var tempList=eventObject;
+	tempList.sort(function(a, b){
+		if((a.date).getTime() < (b.date).getTime()) return -1;
+		if((a.date).getTime() > (b.date).getTime()) return 1;
 		return 0;
 	})
 	return tempList;
