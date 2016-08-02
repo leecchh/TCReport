@@ -1,8 +1,3 @@
-$( function() {
-    $( "#startRange" ).datepicker();
-	$( "#endRange" ).datepicker();
-  } );
-
 //Constant variables
 var NOON = 12;
 var MINUTEINHOUR = 60.0;
@@ -304,7 +299,7 @@ function onSucceededCallback(sender, args) {
 		var startMinute = (listItem.get_item(startTimeString)).getMinutes();
 
 		//Execute code if session in event we want to query and in date range
-		if((eventName == eventWant) && (tempFullDate >= startDate) && (tempFullDate <= endDate)) {
+		if((eventName == eventWant) && (tempFullDate >= startDate) && (tempFullDate < endDate)) {
 			//Changing the format from 24-hour to am/pm for start time
 			var ampmString = (attachAmpmString(startHour)).ampmString;
 			startHour = (attachAmpmString(startHour)).hour;
@@ -757,5 +752,7 @@ $(window).load(function() {
 		document.getElementById("startRange").value = "01/01/2016";
 		document.getElementById("endRange").value = "01/01/2020";
 	}*/
-	getEvent();
+	getEvent();	
+	$( "#startRange" ).datepicker();
+	$( "#endRange" ).datepicker();
 });
