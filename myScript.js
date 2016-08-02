@@ -1,3 +1,8 @@
+$( function() {
+    $( "#startRange" ).datepicker();
+	$( "#endRange" ).datepicker();
+  } );
+
 //Constant variables
 var NOON = 12;
 var MINUTEINHOUR = 60.0;
@@ -180,7 +185,7 @@ function venueCallback(sender, args) {
 }
 
 //This function loads the list and runs the query to produce the T&C Report
-function queryListItems() {
+function queryListItems() {	
 	startDate = new Date(document.getElementById("startRange").value);
 	endDate = new Date(document.getElementById("endRange").value);
 	//account for time zone difference
@@ -741,7 +746,7 @@ $(window).load(function() {
 		dayString = "0" + dayString;
 	}
 	currentDate = currentDate.getFullYear() + "-" + monthString + "-" + dayString;
-
+	
 	//Update the startRange to the current date
 	//document.getElementById("startRange").value = currentDate;
 	//UNCOMMENT when finished if needed
