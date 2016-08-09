@@ -365,6 +365,9 @@ function onSucceededCallback(sender, args) {
 			var speakerStringArray = [];
 			var hostStringArray = [];
 			var chairpersonStringArray = [];
+			var panelStringArray = [];
+			var moderatorStringArray = [];
+			var stakeholderStringArray = [];
 
 			//iterate through each contact of the session				
 			while(listItem.get_item('Speakers')[count] != undefined) {
@@ -421,7 +424,7 @@ function onSucceededCallback(sender, args) {
 					case "Host":
 						hostStringArray.push(tempObj);
 						break;
-					case "General":
+					case "Contact":
 						generalStringArray.push(tempObj);
 						break;
 					case "Speaker":
@@ -429,6 +432,15 @@ function onSucceededCallback(sender, args) {
 						break;
 					case "Chairperson":
 						chairpersonStringArray.push(tempObj);
+						break;
+					case "Panel":
+						panelStringArray.push(tempObj);
+						break;
+					case "Moderator":
+						moderatorStringArray.push(tempObj);
+						break;
+					case "Stakeholder":
+						stakeholderStringArray.push(tempObj);
 						break;
 					default:
 						contactStringSum+=tempContactString;
@@ -442,6 +454,9 @@ function onSucceededCallback(sender, args) {
 			generalStringArray=sortContact(generalStringArray);
 			speakerStringArray=sortContact(speakerStringArray);
 			chairpersonStringArray=sortContact(chairpersonStringArray);
+			panelStringArray=sortContact(panelStringArray);
+			moderatorStringArray=sortContact(moderatorStringArray);
+			stakeholderStringArray=sortContact(stakeholderStringArray);
 			
 			//reset firstContactType to true
 			firstContactType = true;
@@ -450,8 +465,11 @@ function onSucceededCallback(sender, args) {
 			//Add to the following list when new types of contacts are added
 			contactStringSum += contactAlign(combineStringArray(speakerStringArray), "Speakers:");
 			contactStringSum += contactAlign(combineStringArray(hostStringArray), "Hosts:");
-			contactStringSum += contactAlign(combineStringArray(generalStringArray), "General:");
+			contactStringSum += contactAlign(combineStringArray(generalStringArray), "Contact:");
 			contactStringSum += contactAlign(combineStringArray(chairpersonStringArray), "Chairperson:");
+			contactStringSum += contactAlign(combineStringArray(panelStringArray), "Panel:");
+			contactStringSum += contactAlign(combineStringArray(moderatorStringArray), "Moderator:");
+			contactStringSum += contactAlign(combineStringArray(stakeholderStringArray), "Stakeholder:");
 
 			//Whether this is a group session
 			var check = "";
