@@ -556,10 +556,10 @@ function onSucceededCallback(sender, args) {
 
 		//Only break if it's the first page
 		if(firstPage) {
-			markup += "<table style='width:100%'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr + "</th></tr><tr><th class='firstColumn'>Time</th>" +
+			markup += "<table style='width:100%'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr +", "+(sessionOrderObjectArray[i].date).getFullYear()+ "</th></tr><tr><th class='firstColumn'>Time</th>" +
 				"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
 		} else {
-			markup += "<table style='width:100%' class='tableBreak'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr + "</th></tr><tr><th class='firstColumn'>Time</th>" +
+			markup += "<table style='width:100%' class='tableBreak'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " +  dayStr +", "+(sessionOrderObjectArray[i].date).getFullYear()+ "</th></tr><tr><th class='firstColumn'>Time</th>" +
 				"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
 		}
 		
@@ -731,11 +731,6 @@ function sortEvents(eventObject){
 	return tempList;
 }
 
-//In progress
-function returnAttribute(){
-	
-}
-
 //Runs 3 functions to generate the report
 function generateReport() {
 	querySpeaker();
@@ -758,18 +753,22 @@ $(window).load(function() {
 	if(dayString < 10) {
 		dayString = "0" + dayString;
 	}
-	currentDate = currentDate.getFullYear() + "-" + monthString + "-" + dayString;
+	currentDate = "01/01/" +currentDate.getFullYear() ;
+	//alert(currentDate.getFullYear())
+	//var year2=currentDate.getFullYear()+5
+	//var currentDate2 = monthString + "/" + dayString + "/" +year2 ;
 	
 	//Update the startRange to the current date
 	//document.getElementById("startRange").value = currentDate;
 	//UNCOMMENT when finished if needed
 
 	//Slightly different display below if browser is not Chrome
-	/*if( navigator.userAgent.indexOf("Chrome") == -1 ) 
+	if( navigator.userAgent.indexOf("Chrome") == -1 ) 
 	{
-		document.getElementById("startRange").value = "01/01/2016";
-		document.getElementById("endRange").value = "01/01/2020";
-	}*/
+		document.getElementById("startRange").value = currentDate;
+		newDate = new Date(Date.now())
+		document.getElementById("endRange").value = "12/31/2020";
+	}
 	getEvent();	
 	$( "#startRange" ).datepicker();
 	$( "#endRange" ).datepicker();
