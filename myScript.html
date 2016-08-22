@@ -2,16 +2,10 @@
 <!--MAKE SURE POP UP IS NOT BLOCKED-->
 <!--USE INTERNET EXPLORER BROWSER TO ENSURE NO ERRORS-->
 <!--DISABLE SKYPE PLUGIN TO GET RID OF SKYPE BUTTON NEXT TO NUMBER-->
-<!-- "ok" at end of speaker if speaker agreed to speak-->
+<!-- "OK" at end of speaker if speaker agreed to speak-->
 
-<!-- ASK for dynamic date for events, note text field-->
-<!-- ASK for name and number for network office and district network office-->
-<!-- ASK Horizontal or Vertical for multiples venues-->
+<!-- dynamic date for events, note text field-->
 <!-- ASK dynamic checkboxes that gets contact attributes (Figure out how to pull a list of the attributes, google research)-->
-
-<!-- Come up with a creative function-->
-<!-- User Login for specific notes, userId, name  ctx.ctxId = 32; (540) (566) CTXNum="36"-->
-<!-- Notification for changes made (specific people) -->
 
 <html>
 <head>
@@ -42,10 +36,11 @@ End Date Range: <input type="date" id="endRange" value="12/31/2020"><br>
 <input type="checkbox" id="NONumber"> NO Number<br>
 <input type="checkbox" id="DNONumber"> DNO Number<br>
 <input type="checkbox" id="speakerAgree"> Speaker Agreement<br>
-<input type="checkbox" id="speakerCompliance"> Speaker Compliance<br>
-<br><br>
+<input type="checkbox" id="speakerCompliance"> Speaker Compliance<br><br>
 <span><button type="button" onclick="selectDeselectAll(true);">Select All</button></span>
 <span><button type="button" onclick="selectDeselectAll(false);">Deselect All</button></span><br><br>
+<br>Report Notes:<br><textarea rows="4" cols="50" id="notes">
+</textarea><br><br>
 <span><button id="queryButton" onclick="generateReport()">Create Report</button></span>
 </body>
 </html>

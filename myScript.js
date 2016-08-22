@@ -280,7 +280,7 @@ function onSucceededCallback(sender, args) {
 	markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>" +
 		"<title>T&C Report</title><body><center><h2>2016 Annual Meeting of the Association of Network" +
 		" Representatives</h2><div id='location'>" + venueString + "" +
-		"</div><br></center>";
+		"</div></center><center><h3>"+document.getElementById("notes").value+"</h3></center><br>";
 	//Loop through all the items  
 	while(enumerator.moveNext()) //for each session possible
 	{
@@ -753,10 +753,10 @@ $(window).load(function() {
 	if(dayString < 10) {
 		dayString = "0" + dayString;
 	}
-	currentDate = "01/01/" +currentDate.getFullYear() ;
-	//alert(currentDate.getFullYear())
-	//var year2=currentDate.getFullYear()+5
-	//var currentDate2 = monthString + "/" + dayString + "/" +year2 ;
+	var year1=currentDate.getFullYear();
+	var year2=year1+4;
+	currentDate = "01/01/" +year1 ;
+	var currentDate2 = "01/01/" +year2 ;
 	
 	//Update the startRange to the current date
 	//document.getElementById("startRange").value = currentDate;
@@ -766,8 +766,7 @@ $(window).load(function() {
 	if( navigator.userAgent.indexOf("Chrome") == -1 ) 
 	{
 		document.getElementById("startRange").value = currentDate;
-		newDate = new Date(Date.now())
-		document.getElementById("endRange").value = "12/31/2020";
+		document.getElementById("endRange").value = currentDate2;
 	}
 	getEvent();	
 	$( "#startRange" ).datepicker();
