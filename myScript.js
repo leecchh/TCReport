@@ -757,10 +757,6 @@ $(window).load(function() {
 	var year2=year1+4;
 	currentDate = "01/01/" +year1 ;
 	var currentDate2 = "01/01/" +year2 ;
-	
-	//Update the startRange to the current date
-	//document.getElementById("startRange").value = currentDate;
-	//UNCOMMENT when finished if needed
 
 	//Slightly different display below if browser is not Chrome
 	if( navigator.userAgent.indexOf("Chrome") == -1 ) 
