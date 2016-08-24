@@ -278,9 +278,9 @@ function onSucceededCallback(sender, args) {
 	}
 
 	markup = "<head><link rel='stylesheet' type='text/css' href='/sites/fo/tacr/SiteAssets/myScript.css'></head>" +
-		"<title>T&C Report</title><body><center><h2>2016 Annual Meeting of the Association of Network" +
-		" Representatives</h2><div id='location'>" + venueString + "" +
-		"</div></center><center><h3>"+document.getElementById("notes").value+"</h3></center><br>";
+		"<title>T&C Report</title><body><br><br><br><br><br><br><br><br><br><center><img src='/sites/fo/tacr/SiteAssets/numutual.jpg' height=17%></img></center><br><br><center><h2>2016 Annual Meeting of the Association of <br>Network" +
+		" Representatives<br>T&C Report</h2><div id='location'>" + venueString + "" +
+		"</div></center><center><h3>"+document.getElementById("notes").value+"</h3></center><br><br>";
 	//Loop through all the items  
 	while(enumerator.moveNext()) //for each session possible
 	{
@@ -545,7 +545,6 @@ function onSucceededCallback(sender, args) {
 	//Sorts session order according to startTime
 	sessionOrderObjectArray=sortEvents(sessionOrderObjectArray);
 	
-	var firstPage = true;
 	//Add each html element in the sorted array into the document to be displayed
 	for(var i = 0; i < sessionOrderObjectArray.length; i++) {
 		var dayStr = (sessionOrderObjectArray[i].date).getDate();
@@ -554,17 +553,8 @@ function onSucceededCallback(sender, args) {
 		//Gets the string for the day of week from the dictionary
 		var dayOfWeekString = dayOfWeekDictionary[(sessionOrderObjectArray[i].date).getDay()];
 
-		//Only break if it's the first page
-		if(firstPage) {
-			markup += "<table style='width:100%'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " + dayStr +", "+(sessionOrderObjectArray[i].date).getFullYear()+ "</th></tr><tr><th class='firstColumn'>Time</th>" +
-				"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
-		} else {
-			markup += "<table style='width:100%' class='tableBreak'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " +  dayStr +", "+(sessionOrderObjectArray[i].date).getFullYear()+ "</th></tr><tr><th class='firstColumn'>Time</th>" +
-				"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
-		}
-		
-		//Mark that it is past the first page
-		firstPage = false;
+		markup += "<table style='width:100%' class='tableBreak'><thead><tr><th colspan='3' class='date'>" + dayOfWeekString + ", " + monthStr + " " +  dayStr +", "+(sessionOrderObjectArray[i].date).getFullYear()+ "</th></tr><tr><th class='firstColumn'>Time</th>" +
+			"<th class='secondColumn'>Session</th><th class='thirdColumn'>Contacts</th></tr></thead>";
 
 		markup += sessionOrderObjectArray[i].string;
 		//While loop to link all sessions in same day to the same table
